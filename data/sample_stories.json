@@ -1,0 +1,10 @@
+{
+  "stories": [
+    {
+      "id": "story1",
+      "title": "The Lost Key",
+      "content": "In a small town, Emma finds an old key that leads to a mysterious door.",
+      "genre": "mystery"
+    }
+  ]
+}
