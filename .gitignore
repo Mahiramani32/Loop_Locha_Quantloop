@@ -1,0 +1,57 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dll
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+.env
+*.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Cache files
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Model files (keep these but don't commit large ones)
+*.pkl
+*.h5
+*.joblib
+!backend/models/emotion_model.pkl  # Keep small models
+
+# Logs
+*.log
+logs/
+
+# Data cache (don't commit cached data)
+backend/data/cache/*
+!backend/data/sample_stories.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Project specific
+backend/__pycache__/
+backend/*/__pycache__/
