@@ -1,0 +1,49 @@
+﻿{
+  "stories": [
+    {
+      "id": "story_001",
+      "title": "The Brave Knight",
+      "author": "Anonymous",
+      "language": "en",
+      "text": "Once upon a time, in a faraway kingdom, there lived a brave knight named Sir Edward. He was known throughout the land for his courage and kindness. One day, a terrible dragon threatened the village. Sir Edward grabbed his sword and shield and rode to face the beast. The dragon breathed fire, but the knight stood his ground. With one mighty swing, he defeated the dragon. The village was saved, and everyone lived happily ever after.",
+      "emotion": "joy",
+      "word_count": 87
+    },
+    {
+      "id": "story_002",
+      "title": "The Lost Puppy",
+      "author": "Anonymous",
+      "language": "en",
+      "text": "A small puppy wandered away from home and got lost in the big city. He was scared and alone, searching for something familiar. The puppy cried softly, missing his family. Just when he thought all hope was lost, a kind child found him and helped him find his way home. The reunion was filled with joy and tears.",
+      "emotion": "sadness",
+      "word_count": 64
+    },
+    {
+      "id": "story_003",
+      "title": "El Caballero Valiente",
+      "author": "Anonymous",
+      "language": "es",
+      "text": "Érase una vez, en un reino lejano, vivía un valiente caballero llamado Sir Eduardo. Era conocido en toda la tierra por su coraje y bondad. Un día, un terrible dragón amenazó al pueblo. Sir Eduardo tomó su espada y escudo y cabalgó para enfrentar a la bestia. El dragón lanzó fuego, pero el caballero mantuvo su posición. Con un poderoso golpe, derrotó al dragón. El pueblo fue salvado y todos vivieron felices para siempre.",
+      "emotion": "joy",
+      "word_count": 95
+    },
+    {
+      "id": "story_004",
+      "title": "The Mysterious Letter",
+      "author": "Jane Doe",
+      "language": "en",
+      "text": "John was sitting in his cozy cottage when a letter slid under the door. 'What's this?' he wondered, picking it up. The envelope had no return address. Suddenly, he heard a knock. His heart raced with fear. He opened the door and saw Mary, smiling warmly. 'I have wonderful news!' she exclaimed. The letter was from his long-lost brother, who was coming home at last!",
+      "emotion": "surprise",
+      "word_count": 78
+    },
+    {
+      "id": "story_005",
+      "title": "The Storm",
+      "author": "John Smith",
+      "language": "en",
+      "text": "The wind howled outside as dark clouds gathered. Sarah watched from her window, feeling anxious. The storm was getting worse. Suddenly, a tree crashed down, blocking the road. She was terrified. But then she saw her neighbors coming to help, working together in the rain. Her fear turned to gratitude as they cleared the path.",
+      "emotion": "fear",
+      "word_count": 62
+    }
+  ]
+}

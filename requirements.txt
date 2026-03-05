@@ -1,0 +1,39 @@
+﻿# Core NLP Libraries
+nltk==3.8.1
+spacy==3.7.2
+textblob==0.17.1
+langdetect==1.0.9
+pycountry==23.12.11
+
+# Data Processing
+numpy==2.2.0
+pandas==3.0.1
+scikit-learn==1.8.0
+scipy==1.17.1
+
+# Web Framework
+flask==3.0.0
+flask-cors==4.0.0
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Utilities
+tqdm==4.67.3
+joblib==1.5.3
+colorama==0.4.6
+contractions==0.1.73
+clean-text==0.6.0
+ftfy==6.3.1
+regex==2026.2.28
+
+# Testing
+pytest==7.4.3
+pytest-cov==4.1.0
+
+# Visualization (optional)
+matplotlib==3.10.8
+seaborn==0.12.2
+
+# ML Libraries
+xgboost==2.0.3
+threadpoolctl==3.6.0
