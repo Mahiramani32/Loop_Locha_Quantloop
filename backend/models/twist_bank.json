@@ -1,0 +1,53 @@
+{
+  "betrayal": [
+    "The trusted friend was working for the enemy all along.",
+    "The mentor reveals they have been manipulating the hero.",
+    "The hero's own family member betrays them for power.",
+    "The partner was secretly recording everything for the police.",
+    "The helper was actually sent by the villain to monitor the hero."
+  ],
+  "revelation": [
+    "The hero discovers they are actually from the parallel world.",
+    "The mysterious key opens a door to the hero's own past.",
+    "The villain is revealed to be the hero's future self.",
+    "The dead partner never died - they've been in hiding.",
+    "The hero discovers they have superpowers they never knew about.",
+    "The crime scene was staged by the victim themselves."
+  ],
+  "identity": [
+    "The detective is actually the criminal they're hunting.",
+    "The long-lost parent is actually the villain.",
+    "The best friend has been impersonating someone else.",
+    "The hero and villain are the same person with split personality.",
+    "The witness is actually the one who committed the crime."
+  ],
+  "time": [
+    "The events have been happening in a time loop.",
+    "The story is actually happening in the past/future.",
+    "Time is moving backward without anyone noticing.",
+    "The key doesn't open doors - it travels through time.",
+    "The same day keeps repeating with small changes."
+  ],
+  "suspense": [
+    "Someone is watching them from the shadows.",
+    "The safe place is actually the most dangerous.",
+    "A trusted object is actually a surveillance device.",
+    "The phone calls are coming from inside the house.",
+    "They are not alone - something has been following them.",
+    "The mirror reflection doesn't match the person."
+  ],
+  "moral_dilemma": [
+    "Saving one person means sacrificing another.",
+    "The truth will destroy someone innocent.",
+    "The hero must choose between love and duty.",
+    "Doing the right thing has terrible consequences.",
+    "The only way to win is to become like the villain."
+  ],
+  "unexpected_ally": [
+    "The villain's sidekick decides to help the hero.",
+    "The enemy of my enemy becomes a friend.",
+    "A stranger knows more about the hero than they should.",
+    "The person they were hunting joins forces with them.",
+    "The monster they feared is actually protecting them."
+  ]
+}
