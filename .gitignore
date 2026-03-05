@@ -55,3 +55,6 @@ backend/data/cache/*
 # Project specific
 backend/__pycache__/
 backend/*/__pycache__/
+
+# Other repositories
+Loop_Locha_Quantloop/
