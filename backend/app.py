@@ -47,6 +47,11 @@ from modules.cliffhanger_scorer import CliffhangerScorer
 from modules.retention_predictor import RetentionPredictor
 from modules.graph_generator import GraphGenerator
 
+# Person 2's NLP modules
+from modules.language_detector import LanguageDetector
+from modules.story_decomposer import StoryDecomposer
+from modules.emotion_analyzer import EmotionAnalyzer
+
 # Initialize Flask app
 app = Flask(__name__)
 app.config.from_object(current_config)
@@ -54,7 +59,7 @@ app.config.from_object(current_config)
 # Enable CORS for frontend
 CORS(app, origins=app.config['CORS_ORIGINS'])
 
-# Initialize Person 3's modules (NOW logger is defined)
+# Initialize Person 3's modules
 logger.info("📊 Initializing Person 3's Analytics Modules...")
 cliffhanger_scorer = CliffhangerScorer()
 retention_predictor = RetentionPredictor()
@@ -67,9 +72,14 @@ twist_generator = TwistGenerator()
 suggestion_engine = SuggestionEngine()
 logger.info("✅ Person 4's creative modules initialized")
 
+# Initialize Person 2's NLP modules
+logger.info("🔍 Initializing Person 2's NLP Modules...")
+language_detector = LanguageDetector()
+story_decomposer = StoryDecomposer()
+emotion_analyzer = EmotionAnalyzer()
+logger.info("✅ Person 2's NLP modules initialized")
+
 # Simple cache that works
-# Simple cache that works - UPDATED VERSION
-# Simple cache that works - ULTIMATE FIX
 class SimpleCache:
     def __init__(self, timeout_seconds=300):
         self.cache = {}
@@ -193,7 +203,7 @@ def validate_story():
 def analyze_story():
     """
     Analyze story and generate episodes with emotions, cliffhangers, etc.
-    Now integrated with Person 3's analytics modules!
+    Now integrated with Person 2's NLP and Person 3's analytics modules!
     """
     try:
         # Get and validate input
@@ -226,54 +236,40 @@ def analyze_story():
         
         logger.info(f"🔄 CACHE MISS: {cache_key[:8]} - generating new result")
         
-        # ===== PERSON 2's CODE WOULD GO HERE =====
-        # For now, we're using mock episodes
-        # When Person 2 is ready, replace this with:
-        # episodes_data = story_decomposer.decompose(story, num_episodes)
-        # for episode in episodes_data:
-        #     emotions = emotion_analyzer.analyze(episode['content'])
-        #     episode['emotional_arc'] = emotions
+        # ===== PERSON 2's NLP MODULES =====
+        logger.info("🔍 Calling Person 2's NLP Modules")
         
-        # Generate mock episodes (temporary - remove when Person 2 is integrated)
-        words = story.split()
-        word_count = len(words)
+        # 1. Detect language
+        language = language_detector.detect_language(story, return_name=False)
+        logger.info(f"   • Detected language: {language}")
         
-        # Handle short stories
-        if word_count < num_episodes * 10:
-            words = words * ((num_episodes * 10) // word_count + 1)
-            word_count = len(words)
+        # 2. Decompose story into episodes
+        episodes_data = story_decomposer.decompose(story, num_episodes, language)
+        logger.info(f"   • Split into {len(episodes_data)} episodes")
         
-        words_per_episode = max(1, word_count // num_episodes)
-        
-        # Generate episodes
+        # 3. Analyze emotions for each episode
         episodes = []
-        
-        for i in range(num_episodes):
-            episode_num = i + 1
+        for episode_data in episodes_data:
+            # Combine summary and cliffhanger for emotion analysis
+            episode_text = episode_data.get('summary', '')
+            if 'cliffhanger' in episode_data:
+                episode_text += " " + episode_data['cliffhanger']
             
-            # Mock emotional arc (temporary)
-            emotional_arc = {
-                "joy": round(0.3 + (i * 0.08), 2),
-                "sadness": round(0.4 - (i * 0.04), 2),
-                "anger": round(0.2 + (i * 0.01), 2),
-                "fear": round(0.3 + (i * 0.02), 2),
-                "surprise": round(0.5 + (i * 0.08), 2)
-            }
-            
-            # Get episode content
-            start_idx = i * words_per_episode
-            end_idx = (i + 1) * words_per_episode if i < num_episodes - 1 else word_count
-            episode_content = ' '.join(words[start_idx:end_idx])
+            # Analyze emotions
+            emotion_result = emotion_analyzer.analyze_episode(episode_text, episode_data['number'])
             
             episodes.append({
-                "episode_number": episode_num,
-                "title": f"Episode {episode_num}: {title[:20]}",
-                "content": episode_content[:200] + "..." if len(episode_content) > 200 else episode_content,
+                "episode_number": episode_data['number'],
+                "title": episode_data['title'],
+                "summary": episode_data['summary'],
+                "cliffhanger": episode_data.get('cliffhanger', ''),
+                "content": episode_text,
                 "duration_seconds": 90,
-                "emotional_arc": emotional_arc,
-                # These will be overwritten by Person 3's modules
-                "cliffhanger_score": 0.5,  # Placeholder
-                "retention_score": 0.8      # Placeholder
+                "emotional_arc": emotion_result['emotion_curve'],
+                "emotion_stats": emotion_result['statistics'],
+                # Placeholders for Person 3
+                "cliffhanger_score": 0.5,
+                "retention_score": 0.8
             })
         
         # ===== PERSON 3's ANALYTICS MODULES =====
@@ -285,7 +281,7 @@ def analyze_story():
         cliffhanger_details = []
         
         for i, episode in enumerate(episodes):
-            # Score cliffhanger using Person 3's module - CORRECT METHOD
+            # Score cliffhanger using Person 3's module
             cliffhanger_result = cliffhanger_scorer.analyze_story(episode.get('content', ''))
             episode['cliffhanger_score'] = cliffhanger_result['overall_score']
             episode['cliffhanger_moments'] = cliffhanger_result['cliffhanger_moments']
@@ -294,7 +290,7 @@ def analyze_story():
             # Store for later use
             cliffhanger_details.append(cliffhanger_result)
             
-            # Predict retention using Person 3's module - CORRECT METHOD
+            # Predict retention using Person 3's module
             story_data = {
                 'cliffhanger_score': episode['cliffhanger_score'],
                 'cliffhanger_count': episode['cliffhanger_count']
@@ -310,8 +306,7 @@ def analyze_story():
         
         # Calculate overall scores using Person 3's data
         overall_scores = {
-            "emotional_depth": round(sum(e['emotional_arc']['joy'] + e['emotional_arc']['fear'] 
-                                        for e in analyzed_episodes) / (num_episodes * 2), 2),
+            "emotional_depth": round(sum(e['emotional_arc'][point]['intensity'] for e in analyzed_episodes for point in range(len(e['emotional_arc']))) / (num_episodes * 4), 2),
             "cliffhanger_quality": round(sum(e['cliffhanger_score'] for e in analyzed_episodes) / num_episodes, 2),
             "retention_prediction": round(sum(e['retention_score'] for e in analyzed_episodes) / num_episodes, 2),
             "coherence": 0.75
@@ -359,6 +354,7 @@ def analyze_story():
             "story_id": cache_key[:8],
             "title": title,
             "total_episodes": num_episodes,
+            "language": language,
             "analysis_timestamp": datetime.utcnow().isoformat(),
             
             # Person 3's analytics data
@@ -376,9 +372,9 @@ def analyze_story():
             
             # Additional data
             "emotional_progression": {
-                "start": analyzed_episodes[0]['emotional_arc'] if analyzed_episodes else {},
-                "middle": analyzed_episodes[num_episodes//2]['emotional_arc'] if analyzed_episodes else {},
-                "end": analyzed_episodes[-1]['emotional_arc'] if analyzed_episodes else {}
+                "start": analyzed_episodes[0]['emotional_arc'][0]['emotion'] if analyzed_episodes and analyzed_episodes[0]['emotional_arc'] else {},
+                "middle": analyzed_episodes[num_episodes//2]['emotional_arc'][2]['emotion'] if analyzed_episodes and len(analyzed_episodes) > num_episodes//2 and len(analyzed_episodes[num_episodes//2]['emotional_arc']) > 2 else {},
+                "end": analyzed_episodes[-1]['emotional_arc'][-1]['emotion'] if analyzed_episodes and analyzed_episodes[-1]['emotional_arc'] else {}
             }
         }
         
