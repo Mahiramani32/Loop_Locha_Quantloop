@@ -7,9 +7,9 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler
-} from 'chart.js'
-import { Line } from 'react-chartjs-2'
+  Filler,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
@@ -19,76 +19,78 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
-)
+  Filler,
+);
 
 const EmotionChart = ({ data }) => {
+  // Ensure data has the right format
+  const chartLabels = ["Start", "Early", "Middle", "Late", "End"];
+
   const chartData = {
-    labels: ['Start', 'Early', 'Middle', 'Late', 'Climax', 'End'],
+    labels: chartLabels.slice(0, data.joy?.length || 5),
     datasets: [
       {
-        label: 'Joy',
-        data: data.joy,
-        borderColor: 'rgb(255, 205, 86)',
-        backgroundColor: 'rgba(255, 205, 86, 0.1)',
+        label: "Joy",
+        data: data.joy || [],
+        borderColor: "rgb(255, 205, 86)",
+        backgroundColor: "rgba(255, 205, 86, 0.1)",
         tension: 0.4,
-        fill: true
+        fill: true,
       },
       {
-        label: 'Sadness',
-        data: data.sadness,
-        borderColor: 'rgb(54, 162, 235)',
-        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+        label: "Sadness",
+        data: data.sadness || [],
+        borderColor: "rgb(54, 162, 235)",
+        backgroundColor: "rgba(54, 162, 235, 0.1)",
         tension: 0.4,
-        fill: true
+        fill: true,
       },
       {
-        label: 'Anger',
-        data: data.anger,
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+        label: "Anger",
+        data: data.anger || [],
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.1)",
         tension: 0.4,
-        fill: true
+        fill: true,
       },
       {
-        label: 'Fear',
-        data: data.fear,
-        borderColor: 'rgb(153, 102, 255)',
-        backgroundColor: 'rgba(153, 102, 255, 0.1)',
+        label: "Fear",
+        data: data.fear || [],
+        borderColor: "rgb(153, 102, 255)",
+        backgroundColor: "rgba(153, 102, 255, 0.1)",
         tension: 0.4,
-        fill: true
+        fill: true,
       },
       {
-        label: 'Surprise',
-        data: data.surprise,
-        borderColor: 'rgb(75, 192, 192)',
-        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+        label: "Surprise",
+        data: data.surprise || [],
+        borderColor: "rgb(75, 192, 192)",
+        backgroundColor: "rgba(75, 192, 192, 0.1)",
         tension: 0.4,
-        fill: true
-      }
-    ]
-  }
+        fill: true,
+      },
+    ],
+  };
 
   const options = {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
       },
       title: {
-        display: false
-      }
+        display: false,
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
-        max: 100
-      }
-    }
-  }
+        max: 100,
+      },
+    },
+  };
 
-  return <Line data={chartData} options={options} />
-}
+  return <Line data={chartData} options={options} />;
+};
 
-// ⚠️ MAKE SURE THIS LINE IS AT THE BOTTOM:
-export default EmotionChart
+export default EmotionChart;
