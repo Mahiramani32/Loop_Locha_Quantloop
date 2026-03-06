@@ -1,0 +1,65 @@
+"""
+Retention Predictor Module
+Predicts audience retention based on story features
+Author: Mahi
+"""
+
+import numpy as np
+import pickle
+import os
+from typing import Dict, Any, List
+
+class RetentionPredictor:
+    """Predicts audience retention for stories"""
+    
+    def __init__(self, model_path: str = None):
+        self.model_path = model_path or os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'models', 'retention_model.pkl'
+        )
+        self.model = None
+        print("✅ Retention Predictor initialized")
+    
+    def predict_retention(self, story_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Predict audience retention percentage"""
+        
+        # Extract features
+        cliffhanger_score = story_data.get('cliffhanger_score', 0.5)
+        cliffhanger_count = story_data.get('cliffhanger_count', 0)
+        
+        # Simple prediction formula
+        base_retention = 0.5
+        cliffhanger_boost = cliffhanger_score * 0.3
+        count_boost = min(cliffhanger_count * 0.05, 0.2)
+        
+        retention = min(base_retention + cliffhanger_boost + count_boost, 0.95)
+        
+        # Generate retention curve (10 episodes)
+        curve = []
+        current = 1.0
+        for i in range(10):
+            drop_rate = 0.1 * (1 - retention)
+            current = max(0.1, current - drop_rate)
+            curve.append(round(current, 2))
+        
+        return {
+            'predicted_retention': round(retention, 2),
+            'confidence': 0.8,
+            'retention_curve': curve,
+            'recommendations': [
+                "Good retention potential!" if retention > 0.6 else "Consider adding more cliffhangers",
+                f"Predicted {round(retention*100)}% audience retention"
+            ]
+        }
+
+
+# Test
+if __name__ == "__main__":
+    predictor = RetentionPredictor()
+    test_data = {
+        'cliffhanger_score': 0.8,
+        'cliffhanger_count': 3
+    }
+    result = predictor.predict_retention(test_data)
+    print(f"Retention: {result['predicted_retention']*100}%")
+    print(f"Curve: {result['retention_curve'][:3]}...")
