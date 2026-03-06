@@ -23,8 +23,9 @@ ChartJS.register(
 );
 
 const EmotionChart = ({ data }) => {
-  // Ensure data has the right format
-  const chartLabels = ["Start", "Early", "Middle", "Late", "End"];
+  // Generate labels based on actual data length (one point per episode)
+  const dataLength = data.joy?.length || 5;
+  const chartLabels = Array.from({ length: dataLength }, (_, i) => `Ep ${i + 1}`);
 
   const chartData = {
     labels: chartLabels.slice(0, data.joy?.length || 5),

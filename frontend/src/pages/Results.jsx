@@ -59,7 +59,7 @@ const Results = () => {
     }
   }, [result, analysisData]);
 
-  // Prepare emotion chart data - FIXED FOR BACKEND FORMAT
+  // Prepare emotion chart data - aggregates across ALL episodes
   const prepareEmotionData = () => {
     if (
       !analysisData ||
@@ -70,16 +70,6 @@ const Results = () => {
       return null;
     }
 
-    // Get emotions from first episode
-    const firstEpisode = analysisData.episodes[0];
-    console.log("First episode data:", firstEpisode);
-
-    if (!firstEpisode.emotional_arc) {
-      console.log("No emotional_arc found");
-      return null;
-    }
-
-    // Transform emotional_arc object into chart format
     const emotions = {
       joy: [],
       sadness: [],
@@ -89,92 +79,55 @@ const Results = () => {
     };
 
     try {
-      // Check if emotional_arc is an object with emotion scores
-      if (
-        typeof firstEpisode.emotional_arc === "object" &&
-        !Array.isArray(firstEpisode.emotional_arc)
-      ) {
-        console.log(
-          "emotional_arc is an object with scores:",
-          firstEpisode.emotional_arc,
-        );
+      // Iterate through ALL episodes to build a cross-episode emotion journey
+      for (const episode of analysisData.episodes) {
+        const arc = episode.emotional_arc;
+        if (!arc) continue;
 
-        // For a single emotion point, create 5 time points with slight variations
-        const baseEmotions = firstEpisode.emotional_arc;
+        if (Array.isArray(arc) && arc.length > 0) {
+          // Backend returns array of {time, emotion, intensity, all_emotions}
+          // Average the emotion scores across all segments of this episode
+          const epEmotions = { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0 };
+          let count = 0;
 
-        // Create 5 data points with slight variations
-        for (let i = 0; i < 5; i++) {
-          // Add some variation to make the chart interesting (±10%)
-          const variation = 0.9 + Math.random() * 0.2; // 0.9 to 1.1
-
-          emotions.joy.push(
-            Math.min(
-              100,
-              Math.max(0, (baseEmotions.joy || 0.2) * 100 * variation),
-            ),
-          );
-          emotions.sadness.push(
-            Math.min(
-              100,
-              Math.max(0, (baseEmotions.sadness || 0.2) * 100 * variation),
-            ),
-          );
-          emotions.anger.push(
-            Math.min(
-              100,
-              Math.max(0, (baseEmotions.anger || 0.1) * 100 * variation),
-            ),
-          );
-          emotions.fear.push(
-            Math.min(
-              100,
-              Math.max(0, (baseEmotions.fear || 0.2) * 100 * variation),
-            ),
-          );
-          emotions.surprise.push(
-            Math.min(
-              100,
-              Math.max(0, (baseEmotions.surprise || 0.3) * 100 * variation),
-            ),
-          );
-        }
-      }
-      // Handle array format if it exists
-      else if (Array.isArray(firstEpisode.emotional_arc)) {
-        firstEpisode.emotional_arc.forEach((point) => {
-          if (point && point.all_emotions) {
-            emotions.joy.push((point.all_emotions.joy || 0) * 100);
-            emotions.sadness.push((point.all_emotions.sadness || 0) * 100);
-            emotions.anger.push((point.all_emotions.anger || 0) * 100);
-            emotions.fear.push((point.all_emotions.fear || 0) * 100);
-            emotions.surprise.push((point.all_emotions.surprise || 0) * 100);
-          } else if (point && point.emotion && point.intensity) {
-            const intensity = point.intensity * 100;
-            const baseEmotions = {
-              joy: 0,
-              sadness: 0,
-              anger: 0,
-              fear: 0,
-              surprise: 0,
-            };
-
-            if (baseEmotions.hasOwnProperty(point.emotion)) {
-              baseEmotions[point.emotion] = intensity;
-              const remaining = 100 - intensity;
-              const otherEmotions = Object.keys(baseEmotions).filter(
-                (e) => e !== point.emotion,
-              );
-              const share = remaining / otherEmotions.length;
-              otherEmotions.forEach((e) => (baseEmotions[e] = share));
+          for (const point of arc) {
+            if (point && point.all_emotions) {
+              epEmotions.joy += (point.all_emotions.joy || 0);
+              epEmotions.sadness += (point.all_emotions.sadness || 0);
+              epEmotions.anger += (point.all_emotions.anger || 0);
+              epEmotions.fear += (point.all_emotions.fear || 0);
+              epEmotions.surprise += (point.all_emotions.surprise || 0);
+              count++;
+            } else if (point && point.emotion && point.intensity) {
+              // Fallback: distribute intensity to the dominant emotion
+              const intensity = point.intensity;
+              const emotionKey = point.emotion;
+              if (epEmotions.hasOwnProperty(emotionKey)) {
+                epEmotions[emotionKey] += intensity;
+              }
+              // Give small values to others
+              const others = Object.keys(epEmotions).filter(e => e !== emotionKey);
+              const share = (1 - intensity) / others.length;
+              others.forEach(e => { epEmotions[e] += share; });
+              count++;
             }
-
-            emotions.joy.push(baseEmotions.joy);
-            emotions.sadness.push(baseEmotions.sadness);
-            emotions.anger.push(baseEmotions.anger);
-            emotions.fear.push(baseEmotions.fear);
-            emotions.surprise.push(baseEmotions.surprise);
           }
-        });
+
+          if (count > 0) {
+            emotions.joy.push(Math.round((epEmotions.joy / count) * 100));
+            emotions.sadness.push(Math.round((epEmotions.sadness / count) * 100));
+            emotions.anger.push(Math.round((epEmotions.anger / count) * 100));
+            emotions.fear.push(Math.round((epEmotions.fear / count) * 100));
+            emotions.surprise.push(Math.round((epEmotions.surprise / count) * 100));
+          }
+        } else if (typeof arc === "object" && !Array.isArray(arc)) {
+          // Plain object with emotion scores
+          emotions.joy.push(Math.round((arc.joy || 0) * 100));
+          emotions.sadness.push(Math.round((arc.sadness || 0) * 100));
+          emotions.anger.push(Math.round((arc.anger || 0) * 100));
+          emotions.fear.push(Math.round((arc.fear || 0) * 100));
+          emotions.surprise.push(Math.round((arc.surprise || 0) * 100));
+        }
       }
     } catch (err) {
       console.error("Error processing emotion data:", err);
@@ -184,44 +137,55 @@ const Results = () => {
     // Ensure we have at least some data
     if (emotions.joy.length === 0) {
       console.log("No emotion data points found, using fallback");
-      return {
-        joy: [30, 45, 60, 40, 20],
-        sadness: [15, 30, 20, 10, 5],
-        anger: [8, 15, 10, 5, 2],
-        fear: [25, 35, 30, 20, 10],
-        surprise: [10, 25, 40, 35, 15],
-      };
+      return null;
     }
 
-    console.log("Processed emotion data:", emotions);
+    console.log("Processed emotion data across episodes:", emotions);
     return emotions;
   };
 
-  // Get suggestions from analysis
+  // Get suggestions from analysis — handles {critical, improvement, tips} format
   const getSuggestions = () => {
     if (!analysisData) return [];
 
     const suggestions = [];
 
-    // Add cliffhanger suggestions
+    // Handle structured suggestions from backend: {critical: [...], improvement: [...], tips: [...]}
     if (analysisData.suggestions) {
-      analysisData.suggestions.forEach((s) => {
-        if (s.suggestion) suggestions.push(s.suggestion);
-      });
-    }
+      const sug = analysisData.suggestions;
 
-    // Add twist suggestions
-    if (analysisData.twists && analysisData.twists.length > 0) {
-      analysisData.twists.forEach((episode) => {
-        if (episode.twists) {
-          episode.twists.forEach((twist) => {
-            if (twist.text) suggestions.push(`💡 Twist: ${twist.text}`);
+      // Extract from structured format
+      if (sug.critical || sug.improvement || sug.tips) {
+        // Critical suggestions first
+        if (Array.isArray(sug.critical)) {
+          sug.critical.forEach((s) => {
+            if (s.text) suggestions.push(`🔴 ${s.text}`);
           });
         }
-      });
+        // Improvement suggestions
+        if (Array.isArray(sug.improvement)) {
+          sug.improvement.forEach((s) => {
+            if (s.text) suggestions.push(`🟡 ${s.text}`);
+          });
+        }
+        // Tips
+        if (Array.isArray(sug.tips)) {
+          sug.tips.forEach((s) => {
+            if (s.text) suggestions.push(`🔵 ${s.text}`);
+          });
+        }
+      }
+      // Fallback: flat array format
+      else if (Array.isArray(sug)) {
+        sug.forEach((s) => {
+          if (s.suggestion) suggestions.push(s.suggestion);
+          else if (s.text) suggestions.push(s.text);
+          else if (typeof s === "string") suggestions.push(s);
+        });
+      }
     }
 
-    // Add cliffhanger details
+    // Add cliffhanger detail recommendations
     if (analysisData.cliffhanger_details) {
       analysisData.cliffhanger_details.forEach((detail, idx) => {
         if (detail.recommendations && detail.recommendations.length > 0) {
@@ -326,21 +290,24 @@ const Results = () => {
               <h2 className="text-xl font-semibold mb-4">
                 📈 Retention Forecast
               </h2>
-              <div className="flex items-end h-32 gap-2">
-                {analysisData.retention_curve.map((value, idx) => (
-                  <div key={idx} className="flex-1 flex flex-col items-center">
-                    <div
-                      className="w-full bg-gradient-to-t from-green-500 to-green-400 rounded-t-lg"
-                      style={{ height: `${value * 100}%` }}
-                    ></div>
-                    <span className="text-xs mt-2 text-gray-600 dark:text-gray-400">
-                      Ep {idx + 1}
-                    </span>
-                    <span className="text-xs font-semibold">
-                      {Math.round(value * 100)}%
-                    </span>
-                  </div>
-                ))}
+              <div className="flex items-end h-40 gap-2">
+                {analysisData.retention_curve.map((value, idx) => {
+                  const pct = Math.round(value * 100);
+                  return (
+                    <div key={idx} className="flex-1 flex flex-col items-center">
+                      <div
+                        className="w-full bg-gradient-to-t from-green-500 to-green-400 rounded-t-lg transition-all duration-500"
+                        style={{ height: `${pct}%`, minHeight: "4px" }}
+                      ></div>
+                      <span className="text-xs mt-2 text-gray-600 dark:text-gray-400">
+                        Ep {idx + 1}
+                      </span>
+                      <span className="text-xs font-semibold">
+                        {pct}%
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

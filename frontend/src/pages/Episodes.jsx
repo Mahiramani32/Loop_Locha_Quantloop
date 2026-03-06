@@ -18,8 +18,6 @@ const Episodes = () => {
   const analysisData = location.state?.analysisData || null;
 
   // Use analysis data if available
-  // Use analysis data if available
-  // Use analysis data if available
   useEffect(() => {
     const loadEpisodes = async () => {
       setLoading(true);
@@ -28,40 +26,60 @@ const Episodes = () => {
         if (analysisData && analysisData.episodes) {
           console.log("Raw episode data from backend:", analysisData.episodes);
 
+          // Extract per-episode suggestions from the structured suggestions object
+          const allSuggestions = [];
+          if (analysisData.suggestions) {
+            const sug = analysisData.suggestions;
+            if (sug.critical || sug.improvement || sug.tips) {
+              ["critical", "improvement", "tips"].forEach((cat) => {
+                if (Array.isArray(sug[cat])) {
+                  sug[cat].forEach((s) => {
+                    if (s.text) allSuggestions.push({ ...s, category: cat });
+                  });
+                }
+              });
+            }
+          }
+
           const formattedEpisodes = analysisData.episodes.map((ep, index) => {
-            // Get the best available description - CONTENT first, then SUMMARY
+            const epNum = ep.episode_number || index + 1;
+
+            // Get the best available description - PRIORITIZE description field
             let description = "";
-            if (ep.content && ep.content.trim() !== "") {
-              description = ep.content;
-              console.log(
-                `Episode ${index + 1}: Using CONTENT:`,
-                description.substring(0, 50),
-              );
+            if (ep.description && ep.description.trim() !== "") {
+              description = ep.description;
+              console.log(`Episode ${epNum}: Using description`);
             } else if (ep.summary && ep.summary.trim() !== "") {
               description = ep.summary;
-              console.log(
-                `Episode ${index + 1}: Using SUMMARY:`,
-                description.substring(0, 50),
-              );
+              console.log(`Episode ${epNum}: Using summary`);
+            } else if (ep.content && ep.content.trim() !== "") {
+              description = ep.content;
+              console.log(`Episode ${epNum}: Using content`);
             } else {
-              description = "No description available for this episode.";
-              console.log(`Episode ${index + 1}: No description found`);
+              description =
+                "No description available for this episode. Generate a new story to see more detailed episode plots.";
             }
 
+            // Find suggestions for this episode
+            const episodeSuggestions = allSuggestions.filter(
+              (s) => s.episode === epNum,
+            );
+
             return {
-              id: ep.episode_number || index + 1,
-              number: ep.episode_number || index + 1,
-              title: ep.title || `Episode ${index + 1}`,
+              id: epNum,
+              number: epNum,
+              title: ep.title || `Episode ${epNum}`,
               description: description,
+              summary: ep.summary || "",
               cliffhanger: ep.cliffhanger || "To be continued...",
               emotional_arc: ep.emotional_arc || [],
               cliffhanger_score: ep.cliffhanger_score || 0,
               retention_score: ep.retention_score || 0,
               genre: ep.genre || "general",
               twist_suggestions:
-                analysisData.twists?.find(
-                  (t) => t.episode === (ep.episode_number || index + 1),
-                )?.twists || [],
+                analysisData.twists?.find((t) => t.episode === epNum)?.twists ||
+                [],
+              suggestions: episodeSuggestions,
             };
           });
 
@@ -211,7 +229,7 @@ const Episodes = () => {
               </select>
             </div>
 
-            {/* Generate Button - Kept for future implementation */}
+            {/* Generate Button */}
             <div>
               <button
                 onClick={() => {
@@ -253,23 +271,41 @@ const Episodes = () => {
                                     : "bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md"
                                 }`}
                     >
-                      <div className="font-medium flex items-center">
+                      <div className="font-medium flex items-center text-lg mb-1">
                         <span className="mr-2">📺</span>
-                        Episode {ep.number || index + 1}
+                        Episode {ep.number || index + 1}:{" "}
+                        {ep.title.replace(/^Episode \d+:\s*/, "")}
                       </div>
                       <div
-                        className={`text-sm mt-1 ${selectedEpisode?.id === ep.id ? "text-blue-100" : "text-gray-500 dark:text-gray-400"}`}
+                        className={`text-sm text-left mt-2 ${selectedEpisode?.id === ep.id ? "text-blue-100" : "text-gray-600 dark:text-gray-300"} ${selectedEpisode?.id !== ep.id && "line-clamp-2"}`}
                       >
-                        {ep.title}
+                        <span className="font-semibold">Summary:</span>{" "}
+                        {ep.summary || ep.description}
                       </div>
-                      {ep.cliffhanger_score > 0 && (
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                            ⚡ Cliffhanger:{" "}
-                            {(ep.cliffhanger_score * 100).toFixed(0)}%
-                          </span>
+                      {ep.cliffhanger && (
+                        <div
+                          className={`text-sm text-left mt-1 line-clamp-2 ${selectedEpisode?.id === ep.id ? "text-yellow-100" : "text-gray-600 dark:text-gray-300"}`}
+                        >
+                          <span
+                            className={`font-semibold ${selectedEpisode?.id === ep.id ? "text-yellow-200" : "text-amber-600 dark:text-amber-400"}`}
+                          >
+                            Cliffhanger:
+                          </span>{" "}
+                          {ep.cliffhanger}
                         </div>
                       )}
+                      <div className="flex items-center gap-2 mt-3 flex-wrap">
+                        {ep.cliffhanger_score > 0 && (
+                          <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                            ⚡ Cliff: {(ep.cliffhanger_score * 100).toFixed(0)}%
+                          </span>
+                        )}
+                        {ep.retention_score > 0 && (
+                          <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
+                            📈 Ret: {(ep.retention_score * 100).toFixed(0)}%
+                          </span>
+                        )}
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -356,15 +392,17 @@ const Episodes = () => {
                     </div>
                   </div>
 
-                  {/* Episode Content */}
-                  {/* Episode Content */}
-                  <div className="prose dark:prose-invert max-w-none">
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                  {/* Episode Content - Full Description */}
+                  <div className="prose dark:prose-invert max-w-none bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed max-w-none text-base">
+                      <span className="font-semibold block mb-2 text-gray-900 dark:text-white">
+                        Full Description:
+                      </span>
                       {selectedEpisode.description}
                     </p>
                   </div>
 
-                  {/* Twist Suggestions - NEW from backend */}
+                  {/* Twist Suggestions from backend */}
                   {selectedEpisode.twist_suggestions &&
                     selectedEpisode.twist_suggestions.length > 0 && (
                       <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
@@ -383,6 +421,37 @@ const Episodes = () => {
                               </li>
                             ),
                           )}
+                        </ul>
+                      </div>
+                    )}
+
+                  {/* AI Suggestions for this episode */}
+                  {selectedEpisode.suggestions &&
+                    selectedEpisode.suggestions.length > 0 && (
+                      <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                        <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2 flex items-center">
+                          <span className="mr-2">💡</span>
+                          Suggestions
+                        </h3>
+                        <ul className="space-y-2">
+                          {selectedEpisode.suggestions.map((sug, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span
+                                className={`mt-1 ${
+                                  sug.category === "critical"
+                                    ? "text-red-500"
+                                    : sug.category === "improvement"
+                                      ? "text-yellow-500"
+                                      : "text-blue-500"
+                                }`}
+                              >
+                                •
+                              </span>
+                              <span className="text-blue-700 dark:text-blue-400 text-sm">
+                                {sug.text || sug}
+                              </span>
+                            </li>
+                          ))}
                         </ul>
                       </div>
                     )}

@@ -543,13 +543,13 @@ class SuggestionEngine:
         return series_suggestions
     
     def _merge_suggestions(self, suggestions):
-        """Remove duplicates and merge similar suggestions"""
+        """Remove duplicates and merge similar suggestions per episode"""
         seen_texts = set()
         merged = []
         
         for s in suggestions:
-            # Create a simplified key for deduplication
-            simple_key = s['text'].split('.')[0]  # First sentence
+            # Create a simplified key incorporating episode number for deduplication
+            simple_key = f"{s.get('episode', 0)}_{s['text'].split('.')[0]}"
             
             if simple_key not in seen_texts:
                 seen_texts.add(simple_key)

@@ -23,7 +23,7 @@ class Config:
     API_VERSION = os.getenv('API_VERSION', '1.0.0')
     
     # CORS - allow frontend
-    CORS_ORIGINS = ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', 'http://127.0.0.1:3000']
+    CORS_ORIGINS = ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', 'http://127.0.0.1:3000', 'http://localhost:5174', 'http://127.0.0.1:5174']
     
     # Secret key
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-2024')

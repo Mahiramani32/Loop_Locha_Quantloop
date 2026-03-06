@@ -108,7 +108,7 @@ class CliffhangerScorer:
         if not sentence_scores:
             return 0.0
         
-        base_score = np.mean(sentence_scores)
+        base_score = max(sentence_scores) if sentence_scores else 0.0
         count_bonus = min(len(cliffhanger_moments) * 0.05, 0.2)
         
         return min(base_score + count_bonus, 1.0)

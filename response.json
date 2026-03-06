@@ -1,0 +1,108 @@
+﻿{
+  "data": {
+    "analysis_timestamp": "2026-03-06T12:02:33.740386",
+    "emotional_progression": {
+      "end": {
+        "anger": 0.22,
+        "fear": 0.34,
+        "joy": 0.46,
+        "sadness": 0.32,
+        "surprise": 0.66
+      },
+      "middle": {
+        "anger": 0.21,
+        "fear": 0.32,
+        "joy": 0.38,
+        "sadness": 0.36,
+        "surprise": 0.58
+      },
+      "start": {
+        "anger": 0.2,
+        "fear": 0.3,
+        "joy": 0.3,
+        "sadness": 0.4,
+        "surprise": 0.5
+      }
+    },
+    "episodes": [
+      {
+        "cliffhanger_score": 0.4,
+        "content": "A detective named Priya finds a mysterious key at a crime scene. The key glows in her hand and she hears whispers.",
+        "duration_seconds": 90,
+        "emotional_arc": {
+          "anger": 0.2,
+          "fear": 0.3,
+          "joy": 0.3,
+          "sadness": 0.4,
+          "surprise": 0.5
+        },
+        "episode_number": 1,
+        "retention_score": 0.95,
+        "title": "Episode 1: Mystery"
+      },
+      {
+        "cliffhanger_score": 0.5,
+        "content": "She discovers a hidden door that appears only at midnight. When she opens it, she sees her dead partner alive in a",
+        "duration_seconds": 90,
+        "emotional_arc": {
+          "anger": 0.21,
+          "fear": 0.32,
+          "joy": 0.38,
+          "sadness": 0.36,
+          "surprise": 0.58
+        },
+        "episode_number": 2,
+        "retention_score": 0.92,
+        "title": "Episode 2: Mystery"
+      },
+      {
+        "cliffhanger_score": 0.6,
+        "content": "parallel world. She must choose between staying in this perfect world or returning home. But something evil follows her through the door.",
+        "duration_seconds": 90,
+        "emotional_arc": {
+          "anger": 0.22,
+          "fear": 0.34,
+          "joy": 0.46,
+          "sadness": 0.32,
+          "surprise": 0.66
+        },
+        "episode_number": 3,
+        "retention_score": 0.89,
+        "title": "Episode 3: Mystery"
+      }
+    ],
+    "overall_scores": {
+      "cliffhanger_quality": 0.59,
+      "coherence": 0.75,
+      "emotional_depth": 0.66,
+      "retention_prediction": 0.92
+    },
+    "retention_curve": [
+      0.95,
+      0.92,
+      0.89
+    ],
+    "story_id": "f4ac5045",
+    "suggestions": [
+      {
+        "episode": 2,
+        "priority": "high",
+        "suggestion": "Add a stronger cliffhanger at the end of episode 2",
+        "type": "cliffhanger"
+      },
+      {
+        "episode": 4,
+        "priority": "medium",
+        "suggestion": "Increase emotional stakes in episode 4",
+        "type": "emotional"
+      }
+    ],
+    "title": "Mystery",
+    "total_episodes": 3
+  },
+  "message": "Analysis complete",
+  "status_code": 200,
+  "success": true,
+  "timestamp": "2026-03-06T12:02:33.740450"
+}
+

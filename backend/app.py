@@ -56,8 +56,8 @@ from modules.emotion_analyzer import EmotionAnalyzer
 app = Flask(__name__)
 app.config.from_object(current_config)
 
-# Enable CORS for frontend
-CORS(app, origins=app.config['CORS_ORIGINS'])
+# Enable CORS for frontend (allow all origins in development)
+CORS(app)
 
 # Initialize Person 3's modules
 logger.info("📊 Initializing Person 3's Analytics Modules...")
@@ -246,7 +246,31 @@ def analyze_story():
         # 2. Decompose story into episodes
         episodes_data = story_decomposer.decompose(story, num_episodes, language)
         logger.info(f"   • Split into {len(episodes_data)} episodes")
-        
+
+        # Ensure each episode has all required fields
+        for i, episode_data in enumerate(episodes_data):
+            # Ensure number exists
+            if 'number' not in episode_data:
+                episode_data['number'] = i + 1
+            
+            # ENSURE TITLE EXISTS - THIS FIXES THE ERROR!
+            if 'title' not in episode_data or not episode_data['title']:
+                episode_data['title'] = f"Episode {i+1}"
+            
+            # Ensure summary exists
+            if 'summary' not in episode_data or not episode_data['summary']:
+                episode_data['summary'] = f"Part {i+1} of the story"
+            
+            # Ensure description exists
+            if 'description' not in episode_data or not episode_data['description']:
+                episode_data['description'] = episode_data.get('summary', f"Episode {i+1} content")
+            
+            # Ensure cliffhanger exists
+            if 'cliffhanger' not in episode_data or not episode_data['cliffhanger']:
+                episode_data['cliffhanger'] = "To be continued..." if i < num_episodes - 1 else "The end..."
+            
+            logger.info(f"   Episode {i+1} title: {episode_data['title']}")
+
         # 3. Analyze emotions for each episode
         episodes = []
         for episode_data in episodes_data:
@@ -260,8 +284,8 @@ def analyze_story():
             
             episodes.append({
                 "episode_number": episode_data['number'],
-                "title": episode_data['title'],
-                "summary": episode_data['summary'],
+                "title": episode_data['title'],  # Now safe - title is guaranteed to exist
+                "summary": episode_data.get('summary', ''),
                 "cliffhanger": episode_data.get('cliffhanger', ''),
                 "content": episode_text,
                 "duration_seconds": 90,
@@ -270,8 +294,8 @@ def analyze_story():
                 # Placeholders for Person 3
                 "cliffhanger_score": 0.5,
                 "retention_score": 0.8
-            })
-        
+            }) 
+
         # ===== PERSON 3's ANALYTICS MODULES =====
         logger.info("📊 Calling Person 3's Analytics Modules")
         
@@ -344,9 +368,8 @@ def analyze_story():
         # Generate suggestions using Person 4's module
         suggestions = suggestion_engine.generate_suggestions(
             episodes=analyzed_episodes,
-            cliffhanger_scores=[e['cliffhanger_score'] for e in analyzed_episodes],
-            retention_curve=retention_curve,
-            twists=twists
+            language=language,
+            max_suggestions=50
         )
         
         # ===== COMPILE FINAL RESULT =====
@@ -378,6 +401,10 @@ def analyze_story():
             }
         }
         
+        # Debug print
+        if result['episodes']:
+            logger.info(f"DEBUG: First episode keys right before jsonify: {list(result['episodes'][0].keys())}")
+            
         # Cache the result
         cache.set(cache_key, result)
         logger.info(f"💾 Cached result for key: {cache_key[:8]}")

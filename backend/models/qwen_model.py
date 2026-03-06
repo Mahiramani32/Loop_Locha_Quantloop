@@ -7,6 +7,7 @@ Author: Person 2
 import openai
 import os
 import json
+import re
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,25 +21,29 @@ class QwenModel:
         """Initialize the Qwen client"""
         self.api_key = os.getenv("OPENROUTER_API_KEY")
         if not self.api_key:
-            raise ValueError("OPENROUTER_API_KEY not found in .env file!")
+            print("⚠️ OPENROUTER_API_KEY not found in .env file! Using fallback mode.")
+            self.api_key = "dummy-key"
         
         # OpenRouter base URL
         self.base_url = "https://openrouter.ai/api/v1"
         
-        # Configure OpenAI client to use OpenRouter
-        self.client = openai.OpenAI(
-            base_url=self.base_url,
-            api_key=self.api_key,
-            default_headers={
-                "HTTP-Referer": "http://localhost:8000",  # Your app URL
-                "X-Title": "Episodic Intelligence Engine",  # Your app name
-            }
-        )
-        
-        # Model to use (Qwen 3 30B)
-        self.model = "qwen/qwen-2.5-7b-instruct"     # Qwen model
-        
-        print(f"✅ QwenModel initialized with model: {self.model}")
+        try:
+            # Configure OpenAI client to use OpenRouter
+            self.client = openai.OpenAI(
+                base_url=self.base_url,
+                api_key=self.api_key,
+                default_headers={
+                    "HTTP-Referer": "http://localhost:8000",
+                    "X-Title": "Episodic Intelligence Engine",
+                }
+            )
+            
+            # Model to use
+            self.model = "qwen/qwen-2.5-7b-instruct"
+            print(f"✅ QwenModel initialized with model: {self.model}")
+        except Exception as e:
+            print(f"⚠️ Error initializing Qwen client: {e}")
+            self.client = None
     
     def chat_completion(self, prompt, system_prompt=None, max_tokens=1000, temperature=0.7):
         """
@@ -53,6 +58,10 @@ class QwenModel:
         Returns:
             str: Model response
         """
+        if not self.client or self.api_key == "dummy-key":
+            print("⚠️ Qwen client not available, returning None")
+            return None
+        
         messages = []
         
         if system_prompt:
@@ -86,12 +95,12 @@ class QwenModel:
         """
         try:
             # Try to find JSON in the response
-            import re
             json_match = re.search(r'(\{.*\}|\[.*\])', text, re.DOTALL)
             if json_match:
                 return json.loads(json_match.group())
             return None
-        except:
+        except Exception as e:
+            print(f"⚠️ JSON extraction error: {e}")
             return None
 
 
