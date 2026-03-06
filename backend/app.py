@@ -1,9 +1,13 @@
 """
 Main Flask application for the Episodic Intelligence Engine API.
-COMPLETE WORKING VERSION - All fixes applied.
 """
 
 import os
+import sys
+
+# Add backend directory to path so imports work
+sys.path.insert(0, os.path.dirname(__file__))
+
 import logging
 import time
 import hashlib
@@ -15,23 +19,15 @@ from dotenv import load_dotenv
 # Load environment variables FIRST
 load_dotenv()
 
-# Configure logging NEXT (so logger is available for all code)
+# Configure logging NEXT
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+logger.info("🚀 Starting application...")
 
-# Now import Person 4's modules (logger is already defined)
-from modules.twist_generator import TwistGenerator
-from modules.suggestion_engine import SuggestionEngine
-
-# Initialize Person 4's modules
-twist_generator = TwistGenerator()
-suggestion_engine = SuggestionEngine()
-logger.info("✅ Person 4's creative modules initialized")
-
-# Import your local modules
+# Import your local modules - USE ABSOLUTE IMPORTS (no dots)
 from config import current_config
 from utils.validators import StoryValidator
 from utils.helpers import (
@@ -42,6 +38,15 @@ from utils.helpers import (
     write_json_file
 )
 
+# Person 4's modules
+from modules.twist_generator import TwistGenerator
+from modules.suggestion_engine import SuggestionEngine
+
+# Person 3's modules
+from modules.cliffhanger_scorer import CliffhangerScorer
+from modules.retention_predictor import RetentionPredictor
+from modules.graph_generator import GraphGenerator
+
 # Initialize Flask app
 app = Flask(__name__)
 app.config.from_object(current_config)
@@ -49,9 +54,21 @@ app.config.from_object(current_config)
 # Enable CORS for frontend
 CORS(app, origins=app.config['CORS_ORIGINS'])
 
+# Initialize Person 3's modules (NOW logger is defined)
+logger.info("📊 Initializing Person 3's Analytics Modules...")
+cliffhanger_scorer = CliffhangerScorer()
+retention_predictor = RetentionPredictor()
+graph_generator = GraphGenerator()
+logger.info("✅ Person 3's analytics modules initialized")
+
+# Initialize Person 4's modules
+logger.info("🎨 Initializing Person 4's Creative Modules...")
+twist_generator = TwistGenerator()
+suggestion_engine = SuggestionEngine()
+logger.info("✅ Person 4's creative modules initialized")
+
 # Simple cache that works
-# Simple cache that works - IMPROVED VERSION
-# Simple cache that works - IMPROVED VERSION
+# Simple cache that works - UPDATED VERSION
 class SimpleCache:
     def __init__(self, timeout_seconds=300):
         self.cache = {}
@@ -90,6 +107,15 @@ class SimpleCache:
         self.hits = 0
         self.misses = 0
         logger.info("🧹 Cache cleared")
+    
+    def get_stats(self):
+        """Get cache statistics"""
+        return {
+            "hits": self.hits,
+            "misses": self.misses,
+            "size": len(self.cache),
+            "hit_rate": round(self.hits / (self.hits + self.misses) * 100, 2) if (self.hits + self.misses) > 0 else 0
+        }
 
 # Initialize cache
 cache = SimpleCache()
@@ -163,6 +189,7 @@ def validate_story():
 def analyze_story():
     """
     Analyze story and generate episodes with emotions, cliffhangers, etc.
+    Now integrated with Person 3's analytics modules!
     """
     try:
         # Get and validate input
@@ -195,7 +222,15 @@ def analyze_story():
         
         logger.info(f"🔄 CACHE MISS: {cache_key[:8]}")
         
-        # Generate episodes
+        # ===== PERSON 2's CODE WOULD GO HERE =====
+        # For now, we're using mock episodes
+        # When Person 2 is ready, replace this with:
+        # episodes_data = story_decomposer.decompose(story, num_episodes)
+        # for episode in episodes_data:
+        #     emotions = emotion_analyzer.analyze(episode['content'])
+        #     episode['emotional_arc'] = emotions
+        
+        # Generate mock episodes (temporary - remove when Person 2 is integrated)
         words = story.split()
         word_count = len(words)
         
@@ -208,12 +243,11 @@ def analyze_story():
         
         # Generate episodes
         episodes = []
-        retention_curve = []
         
         for i in range(num_episodes):
             episode_num = i + 1
             
-            # Emotional arc changes with episode number
+            # Mock emotional arc (temporary)
             emotional_arc = {
                 "joy": round(0.3 + (i * 0.08), 2),
                 "sadness": round(0.4 - (i * 0.04), 2),
@@ -221,13 +255,6 @@ def analyze_story():
                 "fear": round(0.3 + (i * 0.02), 2),
                 "surprise": round(0.5 + (i * 0.08), 2)
             }
-            
-            # Cliffhanger increases with episodes
-            cliffhanger = round(min(0.9, 0.4 + (i * 0.1)), 2)
-            
-            # Retention slightly decreases
-            retention = round(max(0.6, 0.95 - (i * 0.03)), 2)
-            retention_curve.append(retention)
             
             # Get episode content
             start_idx = i * words_per_episode
@@ -240,50 +267,115 @@ def analyze_story():
                 "content": episode_content[:200] + "..." if len(episode_content) > 200 else episode_content,
                 "duration_seconds": 90,
                 "emotional_arc": emotional_arc,
-                "cliffhanger_score": cliffhanger,
-                "retention_score": retention
+                # These will be overwritten by Person 3's modules
+                "cliffhanger_score": 0.5,  # Placeholder
+                "retention_score": 0.8      # Placeholder
             })
         
-        # Calculate overall scores
+        # ===== PERSON 3's ANALYTICS MODULES =====
+        logger.info("📊 Calling Person 3's Analytics Modules")
+        
+        # Calculate cliffhanger scores and retention for each episode
+        retention_curve = []
+        analyzed_episodes = []
+        cliffhanger_details = []
+        
+        for i, episode in enumerate(episodes):
+            # Score cliffhanger using Person 3's module - CORRECT METHOD
+            cliffhanger_result = cliffhanger_scorer.analyze_story(episode.get('content', ''))
+            episode['cliffhanger_score'] = cliffhanger_result['overall_score']
+            episode['cliffhanger_moments'] = cliffhanger_result['cliffhanger_moments']
+            episode['cliffhanger_count'] = cliffhanger_result['cliffhanger_count']
+            
+            # Store for later use
+            cliffhanger_details.append(cliffhanger_result)
+            
+            # Predict retention using Person 3's module - CORRECT METHOD
+            story_data = {
+                'cliffhanger_score': episode['cliffhanger_score'],
+                'cliffhanger_count': episode['cliffhanger_count']
+            }
+            retention_result = retention_predictor.predict_retention(story_data)
+            
+            episode['retention_score'] = retention_result['predicted_retention']
+            episode['retention_curve'] = retention_result['retention_curve'][:5]  # First 5 episodes
+            episode['retention_recommendations'] = retention_result['recommendations']
+            
+            retention_curve.append(episode['retention_score'])
+            analyzed_episodes.append(episode)
+        
+        # Calculate overall scores using Person 3's data
         overall_scores = {
-            "emotional_depth": round(0.6 + (num_episodes * 0.02), 2),
-            "cliffhanger_quality": round(0.5 + (num_episodes * 0.03), 2),
-            "retention_prediction": round(sum(retention_curve) / num_episodes, 2),
+            "emotional_depth": round(sum(e['emotional_arc']['joy'] + e['emotional_arc']['fear'] 
+                                        for e in analyzed_episodes) / (num_episodes * 2), 2),
+            "cliffhanger_quality": round(sum(e['cliffhanger_score'] for e in analyzed_episodes) / num_episodes, 2),
+            "retention_prediction": round(sum(e['retention_score'] for e in analyzed_episodes) / num_episodes, 2),
             "coherence": 0.75
         }
         
+        # Generate graph data using Person 3's module
+        graph_data = {
+            "cliffhanger_gauges": [],
+            "retention_chart": None
+        }
+        
+        # Add cliffhanger gauges for each episode
+        for i, episode in enumerate(analyzed_episodes):
+            gauge = graph_generator.generate_cliffhanger_gauge(episode['cliffhanger_score'])
+            graph_data["cliffhanger_gauges"].append({
+                "episode": i + 1,
+                "gauge": gauge
+            })
+        
+        # Generate retention chart using the curve from retention_predictor
+        retention_data = {"retention_curve": retention_curve}
+        graph_data["retention_chart"] = graph_generator.generate_retention_chart(retention_data)
+        
+        # ===== PERSON 4's CREATIVE MODULES =====
+        logger.info("🎨 Calling Person 4's Creative Modules")
+        
         # Generate twists using Person 4's module
         twists = twist_generator.generate_twists(
-                story=story,  # Pass the original story
-                episodes=analyzed_episodes,
-                language="en",
-                twists_per_episode=2
-          )
+            story=story,
+            episodes=analyzed_episodes,
+            language="en",
+            twists_per_episode=2
+        )
         
         # Generate suggestions using Person 4's module
         suggestions = suggestion_engine.generate_suggestions(
-            episodes=episodes,
-            cliffhanger_scores=[e['cliffhanger_score'] for e in episodes],
+            episodes=analyzed_episodes,
+            cliffhanger_scores=[e['cliffhanger_score'] for e in analyzed_episodes],
             retention_curve=retention_curve,
             twists=twists
         )
         
-        # Compile result
+        # ===== COMPILE FINAL RESULT =====
         result = {
             "story_id": cache_key[:8],
             "title": title,
             "total_episodes": num_episodes,
             "analysis_timestamp": datetime.utcnow().isoformat(),
+            
+            # Person 3's analytics data
             "overall_scores": overall_scores,
-            "episodes": episodes,
-            "suggestions": suggestions,
+            "graph_data": graph_data,
+            "retention_curve": retention_curve,
+            "cliffhanger_details": cliffhanger_details,
+            
+            # Person 2's episode data (with Person 3's scores added)
+            "episodes": analyzed_episodes,
+            
+            # Person 4's creative data
             "twists": twists,
+            "suggestions": suggestions,
+            
+            # Additional data
             "emotional_progression": {
-                "start": episodes[0]['emotional_arc'] if episodes else {},
-                "middle": episodes[num_episodes//2]['emotional_arc'] if episodes else {},
-                "end": episodes[-1]['emotional_arc'] if episodes else {}
-            },
-            "retention_curve": retention_curve
+                "start": analyzed_episodes[0]['emotional_arc'] if analyzed_episodes else {},
+                "middle": analyzed_episodes[num_episodes//2]['emotional_arc'] if analyzed_episodes else {},
+                "end": analyzed_episodes[-1]['emotional_arc'] if analyzed_episodes else {}
+            }
         }
         
         # Cache the result
@@ -297,6 +389,8 @@ def analyze_story():
         
     except Exception as e:
         logger.error(f"Error in analyze_story: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify(create_response(
             success=False,
             error=f"Internal server error: {str(e)}",
