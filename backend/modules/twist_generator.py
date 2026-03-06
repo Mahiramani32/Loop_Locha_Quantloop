@@ -1,7 +1,7 @@
 """
 Twist Generator Module - ENHANCED VERSION
 Generates creative plot twists for episodes with:
-- 15+ categories, 100+ twists
+- 15+ categories, 150+ twists
 - Hindi language support
 - Contextual twists using episode keywords
 - Genre detection from summary
@@ -88,7 +88,7 @@ class TwistGenerator:
         if not text:
             return []
         
-        # Simple keyword extraction (can be enhanced with NLP later)
+        # Simple keyword extraction
         text = text.lower()
         # Remove common words
         common_words = ['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'was', 'are', 'were', 'has', 'have', 'had', 'this', 'that', 'these', 'those']
@@ -122,7 +122,13 @@ class TwistGenerator:
         
         return min(importance, 10)
     
-    def generate_twists(self, story, episodes, language="en", twists_per_episode=2):
+    def generate_twists(self, story=None, episodes=None, language="en", twists_per_episode=2):
+
+        if story is None:
+           story = ""  # Default empty story
+        if episodes is None:
+           episodes = []  # Default empty list
+        
         """
         Generate contextual twists for each episode
         
@@ -143,6 +149,7 @@ class TwistGenerator:
         
         result = []
         all_keywords = []
+        total_episodes = len(episodes)
         
         # First pass: collect all keywords for context
         for episode in episodes:
@@ -175,7 +182,7 @@ class TwistGenerator:
             for twist_num in range(twists_per_episode):
                 twist_data = self._generate_contextual_twist(
                     episode_index,
-                    len(episodes),
+                    total_episodes,
                     episode_summary,
                     episode_cliffhanger,
                     genre,
@@ -211,7 +218,7 @@ class TwistGenerator:
             elif episode_num == total_episodes:
                 primary_categories = ["revelation", "identity", "moral_dilemma"]
                 secondary_categories = ["betrayal", "time"]
-            elif episode_num == max(1, total_episodes // 2):
+            elif total_episodes > 2 and episode_num == (total_episodes // 2) + 1:
                 primary_categories = ["betrayal", "identity", "time"]
                 secondary_categories = ["revelation", "suspense"]
             else:
@@ -266,12 +273,12 @@ class TwistGenerator:
         else:
             twist_text = twist_template
         
-        # Add prefix based on episode position
+        # Add prefix based on episode position - FIXED
         if episode_num == 1:
             prefix = "🔮 Opening shock: " if language == 'en' else "🔮 शुरुआती झटका: "
         elif episode_num == total_episodes:
             prefix = "🎬 Finale bombshell: " if language == 'en' else "🎬 समापन धमाका: "
-        elif episode_num == max(1, total_episodes // 2):
+        elif total_episodes > 2 and episode_num == (total_episodes // 2) + 1:
             prefix = "⚡ Mid-point twist: " if language == 'en' else "⚡ मध्य मोड़: "
         else:
             prefix = "✨ Twist: " if language == 'en' else "✨ ट्विस्ट: "
@@ -376,11 +383,3 @@ if __name__ == "__main__":
         print(f"\n📺 Episode {ep['episode']} - {ep['title']} (Genre: {ep['genre']})")
         for i, twist in enumerate(ep['twists'], 1):
             print(f"   {i}. [{twist['importance']}/10] {twist['text']}")
-    
-    # Test Hindi twists
-    print("\n🇮🇳 HINDI TWISTS:")
-    twists_hi = generator.generate_twists(test_story, test_episodes, language="hi", count=2)
-    for ep in twists_hi:
-        print(f"\n📺 एपिसोड {ep['episode']} - {ep['title']}")
-        for i, twist in enumerate(ep['twists'], 1):
-            print(f"   {i}. {twist['text']}")

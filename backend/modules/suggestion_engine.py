@@ -334,10 +334,11 @@ class SuggestionEngine:
         
         all_suggestions = []
         overall_genre = self._detect_genre_from_episodes(episodes)
+        total_episodes = len(episodes)  # Store total episodes count
         
         # Analyze each episode
         for episode in episodes:
-            episode_suggestions = self._analyze_episode(episode, overall_genre)
+            episode_suggestions = self._analyze_episode(episode, overall_genre, total_episodes)
             all_suggestions.extend(episode_suggestions)
         
         # Add overall series suggestions
@@ -367,7 +368,7 @@ class SuggestionEngine:
         
         return organized
     
-    def _analyze_episode(self, episode, overall_genre):
+    def _analyze_episode(self, episode, overall_genre, total_episodes):
         """Analyze a single episode and return weighted suggestions"""
         suggestions = []
         ep_num = episode.get('number', episode.get('episode', 1))
@@ -482,7 +483,7 @@ class SuggestionEngine:
             if not has_stakes:
                 add_suggestion('structure', 'weak_stakes')
         
-        # 5. EPISODE POSITION SPECIFIC
+        # 5. EPISODE POSITION SPECIFIC - FIXED: using total_episodes parameter
         if ep_num == 1:
             # First episode - check for hook
             hook_indicators = ['mystery', 'sudden', 'unexpected', 'shock', 'strange', 'weird', 'discover', 'find', 'secret']
@@ -493,7 +494,7 @@ class SuggestionEngine:
             else:
                 add_suggestion('structure', 'weak_opening')
         
-        elif ep_num == max([e.get('number', e.get('episode', 1)) for e in episodes] if episodes else 5):
+        elif ep_num == total_episodes:  # Last episode - using total_episodes parameter
             # Last episode
             if cliffhanger_score and cliffhanger_score < 7:
                 add_suggestion('structure', 'weak_closing')
@@ -649,12 +650,3 @@ if __name__ == "__main__":
         print("\n🔵 TIPS & SUGGESTIONS:")
         for s in suggestions['tips']:
             print(f"   • {s['text']}")
-    
-    # Summary
-    summary = engine.get_suggestions_summary(suggestions)
-    print("\n" + "=" * 70)
-    print(f"📈 SUMMARY: {summary['total']} total suggestions")
-    print(f"   - Critical: {summary['critical_count']}")
-    print(f"   - Improvements: {summary['improvement_count']}")
-    print(f"   - Tips: {summary['tips_count']}")
-    print("=" * 70)

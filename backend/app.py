@@ -12,7 +12,26 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-# SIMPLE IMPORTS
+# Load environment variables FIRST
+load_dotenv()
+
+# Configure logging NEXT (so logger is available for all code)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Now import Person 4's modules (logger is already defined)
+from modules.twist_generator import TwistGenerator
+from modules.suggestion_engine import SuggestionEngine
+
+# Initialize Person 4's modules
+twist_generator = TwistGenerator()
+suggestion_engine = SuggestionEngine()
+logger.info("✅ Person 4's creative modules initialized")
+
+# Import your local modules
 from config import current_config
 from utils.validators import StoryValidator
 from utils.helpers import (
@@ -23,16 +42,6 @@ from utils.helpers import (
     write_json_file
 )
 
-# Load environment variables
-load_dotenv()
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
 # Initialize Flask app
 app = Flask(__name__)
 app.config.from_object(current_config)
@@ -41,16 +50,22 @@ app.config.from_object(current_config)
 CORS(app, origins=app.config['CORS_ORIGINS'])
 
 # Simple cache that works
+# Simple cache that works - IMPROVED VERSION
+# Simple cache that works - IMPROVED VERSION
 class SimpleCache:
     def __init__(self, timeout_seconds=300):
         self.cache = {}
         self.expiry = {}
         self.timeout = timeout_seconds
+        self.hits = 0
+        self.misses = 0
     
     def get(self, key):
         if key in self.cache:
             # Check if expired
             if key in self.expiry and datetime.now() < self.expiry[key]:
+                self.hits += 1
+                logger.info(f"⚡ CACHE HIT: {key[:8]} (hits: {self.hits})")
                 return self.cache[key]
             else:
                 # Remove expired
@@ -58,12 +73,23 @@ class SimpleCache:
                     del self.cache[key]
                 if key in self.expiry:
                     del self.expiry[key]
+        self.misses += 1
+        logger.info(f"🔄 CACHE MISS: {key[:8]} (misses: {self.misses})")
         return None
     
     def set(self, key, value):
         self.cache[key] = value
         self.expiry[key] = datetime.now() + timedelta(seconds=self.timeout)
-        logger.info(f"💾 Cached: {key[:8]}")
+        logger.info(f"💾 Cached: {key[:8]} (expires in {self.timeout}s)")
+        return True
+    
+    def clear(self):
+        """Clear all cache (for testing)"""
+        self.cache.clear()
+        self.expiry.clear()
+        self.hits = 0
+        self.misses = 0
+        logger.info("🧹 Cache cleared")
 
 # Initialize cache
 cache = SimpleCache()
@@ -226,21 +252,21 @@ def analyze_story():
             "coherence": 0.75
         }
         
-        # Suggestions
-        suggestions = [
-            {
-                "type": "cliffhanger",
-                "episode": 2,
-                "suggestion": "Add a stronger cliffhanger at the end of episode 2",
-                "priority": "high"
-            },
-            {
-                "type": "emotional",
-                "episode": 4,
-                "suggestion": "Increase emotional stakes in episode 4",
-                "priority": "medium"
-            }
-        ]
+        # Generate twists using Person 4's module
+        twists = twist_generator.generate_twists(
+                story=story,  # Pass the original story
+                episodes=analyzed_episodes,
+                language="en",
+                twists_per_episode=2
+          )
+        
+        # Generate suggestions using Person 4's module
+        suggestions = suggestion_engine.generate_suggestions(
+            episodes=episodes,
+            cliffhanger_scores=[e['cliffhanger_score'] for e in episodes],
+            retention_curve=retention_curve,
+            twists=twists
+        )
         
         # Compile result
         result = {
@@ -251,6 +277,7 @@ def analyze_story():
             "overall_scores": overall_scores,
             "episodes": episodes,
             "suggestions": suggestions,
+            "twists": twists,
             "emotional_progression": {
                 "start": episodes[0]['emotional_arc'] if episodes else {},
                 "middle": episodes[num_episodes//2]['emotional_arc'] if episodes else {},
