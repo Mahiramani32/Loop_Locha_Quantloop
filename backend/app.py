@@ -69,6 +69,7 @@ logger.info("✅ Person 4's creative modules initialized")
 
 # Simple cache that works
 # Simple cache that works - UPDATED VERSION
+# Simple cache that works - ULTIMATE FIX
 class SimpleCache:
     def __init__(self, timeout_seconds=300):
         self.cache = {}
@@ -76,6 +77,7 @@ class SimpleCache:
         self.timeout = timeout_seconds
         self.hits = 0
         self.misses = 0
+        logger.info(f"🗄️ Cache initialized with timeout {timeout_seconds}s")
     
     def get(self, key):
         if key in self.cache:
@@ -90,6 +92,7 @@ class SimpleCache:
                     del self.cache[key]
                 if key in self.expiry:
                     del self.expiry[key]
+                logger.info(f"⏰ CACHE EXPIRED: {key[:8]}")
         self.misses += 1
         logger.info(f"🔄 CACHE MISS: {key[:8]} (misses: {self.misses})")
         return None
@@ -184,6 +187,7 @@ def validate_story():
             status_code=500
         )), 500
 
+
 @app.route('/api/analyze', methods=['POST'])
 @monitor_performance
 def analyze_story():
@@ -210,17 +214,17 @@ def analyze_story():
         # Generate cache key
         cache_key = hashlib.md5(f"{story}{num_episodes}".encode()).hexdigest()
         
-        # Check cache FIRST (fastest path)
+        # CHECK CACHE FIRST - FAST PATH
         cached_result = cache.get(cache_key)
         if cached_result:
-            logger.info(f"⚡ CACHE HIT: {cache_key[:8]}")
+            logger.info(f"⚡ CACHE HIT: {cache_key[:8]} - returning cached result")
             return jsonify(create_response(
                 success=True,
                 data=cached_result,
                 message="Analysis complete (cached)"
             )), 200
         
-        logger.info(f"🔄 CACHE MISS: {cache_key[:8]}")
+        logger.info(f"🔄 CACHE MISS: {cache_key[:8]} - generating new result")
         
         # ===== PERSON 2's CODE WOULD GO HERE =====
         # For now, we're using mock episodes
@@ -380,6 +384,7 @@ def analyze_story():
         
         # Cache the result
         cache.set(cache_key, result)
+        logger.info(f"💾 Cached result for key: {cache_key[:8]}")
         
         return jsonify(create_response(
             success=True,
