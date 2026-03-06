@@ -1,0 +1,82 @@
+"""
+Graph Generator Module
+Creates visualization data for frontend charts
+Author: Mahi
+"""
+
+from typing import Dict, Any, List
+
+class GraphGenerator:
+    """Generates data for frontend visualizations"""
+    
+    def __init__(self):
+        self.colors = {
+            'joy': '#FBBF24', 'sadness': '#60A5FA', 
+            'anger': '#EF4444', 'fear': '#8B5CF6', 
+            'surprise': '#F472B6', 'primary': '#4F46E5'
+        }
+        print("✅ Graph Generator initialized")
+    
+    def generate_cliffhanger_gauge(self, score: float) -> Dict[str, Any]:
+        """Generate cliffhanger gauge chart data"""
+        
+        if score >= 0.7:
+            color = self.colors['primary']
+            label = 'High'
+            message = "Excellent cliffhanger intensity!"
+        elif score >= 0.4:
+            color = '#F59E0B'
+            label = 'Medium'
+            message = "Good, but could be stronger"
+        else:
+            color = self.colors['anger']
+            label = 'Low'
+            message = "Add more suspenseful moments"
+        
+        return {
+            'chart_type': 'gauge',
+            'title': 'Cliffhanger Intensity',
+            'value': round(score * 100, 1),
+            'color': color,
+            'label': label,
+            'message': message,
+            'min': 0,
+            'max': 100
+        }
+    
+    def generate_retention_chart(self, retention_data: Dict) -> Dict[str, Any]:
+        """Generate retention curve chart"""
+        
+        curve = retention_data.get('retention_curve', [1.0, 0.9, 0.8, 0.7, 0.6])
+        
+        return {
+            'chart_type': 'line',
+            'title': 'Audience Retention Forecast',
+            'x_axis': {
+                'name': 'Episode',
+                'values': list(range(1, len(curve) + 1))
+            },
+            'y_axis': {
+                'name': 'Retention Rate',
+                'min': 0,
+                'max': 1
+            },
+            'series': [{
+                'name': 'Your Story',
+                'data': curve,
+                'color': self.colors['primary']
+            }]
+        }
+
+
+# Test
+if __name__ == "__main__":
+    gen = GraphGenerator()
+    
+    # Test gauge
+    gauge = gen.generate_cliffhanger_gauge(0.8)
+    print(f"Gauge: {gauge['label']} - {gauge['value']}%")
+    
+    # Test retention chart
+    chart = gen.generate_retention_chart({'retention_curve': [1.0, 0.85, 0.72, 0.61, 0.52]})
+    print(f"Chart: {chart['title']}")
