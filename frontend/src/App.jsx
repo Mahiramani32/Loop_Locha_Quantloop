@@ -30,6 +30,7 @@ import Layout from './components/layout/Layout'
 import Home from './pages/Home'
 import Results from './pages/Results'
 import Dashboard from './pages/Dashboard'
+import Episodes from './pages/Episodes'
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
             <Route path="/results" element={<Results />} />
             <Route path="/results/:id" element={<Results />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/episodes" element={<Episodes />} />
           </Routes>
         </Layout>
       </BrowserRouter>
