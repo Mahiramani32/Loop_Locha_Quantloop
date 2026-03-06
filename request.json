@@ -1,8 +1,0 @@
-{
-  "story_text": "Your story text here...",
-  "detailed": true,
-  "options": {
-    "include_sentences": true,
-    "min_confidence": 0.6
-  }
-}
