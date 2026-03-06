@@ -1,0 +1,333 @@
+{
+  "betrayal": {
+    "en": [
+      "The trusted friend was working for the enemy all along.",
+      "The mentor reveals they have been manipulating the hero.",
+      "The hero's own family member betrays them for power.",
+      "The partner was secretly recording everything for the police.",
+      "The helper was actually sent by the villain to monitor the hero.",
+      "The closest ally sells out the hero to save themselves.",
+      "The hero's own creation turns against them.",
+      "The bodyguard was hired by the villain to ensure failure.",
+      "The love interest is actually a spy for the antagonist.",
+      "The partner faked their death and was working with the enemy.",
+      "The childhood friend has been plotting revenge for years.",
+      "The assistant poisons the hero's mind against true allies.",
+      "The security chief leaves the door unlocked for the enemy.",
+      "The adopted sibling wants the inheritance at any cost."
+    ],
+    "hi": [
+      "भरोसेमंद दोस्त असल में दुश्मन के साथ था।",
+      "गुरु असल में हीरो को धोखा दे रहा था।",
+      "अपने ही परिवार ने सत्ता के लिए धोखा दिया।",
+      "साथी पुलिस के लिए गुप्त रिकॉर्डिंग कर रहा था।",
+      "मददगार असल में विलेन ने हीरो पर नजर रखने के लिए भेजा था।",
+      "सबसे करीबी दोस्त ने खुद को बचाने के लिए हीरो को बेच दिया।",
+      "हीरो की अपनी रचना ही उसके खिलाफ हो गई।",
+      "अंगरक्षक को विलेन ने हार सुनिश्चित करने के लिए रखा था।",
+      "प्रेमिका असल में विरोधी के लिए जासूसी कर रही है।"
+    ]
+  },
+  "revelation": {
+    "en": [
+      "The hero discovers they are actually from the parallel world.",
+      "The mysterious key opens a door to the hero's own past.",
+      "The villain is revealed to be the hero's future self.",
+      "The dead partner never died - they've been in hiding.",
+      "The hero discovers they have superpowers they never knew about.",
+      "The crime scene was staged by the victim themselves.",
+      "The hero was adopted and their real parents are the villains.",
+      "The entire story is a dream - or is it?",
+      "The memories the hero trusts are completely false.",
+      "The quest was a test, and they were being watched all along.",
+      "The enemy and hero are the same person with split personality.",
+      "The treasure they seek was with them from the beginning.",
+      "The prophecy was about someone else entirely.",
+      "The hero's entire life has been a simulation.",
+      "The 'curse' is actually a genetic trait running in the family."
+    ],
+    "hi": [
+      "हीरो को पता चलता है कि वह असल में समानांतर दुनिया से है।",
+      "रहस्यमय चाबी हीरो के अपने अतीत का दरवाजा खोलती है।",
+      "विलेन असल में हीरो का भविष्य का रूप है।",
+      "मृत साथी कभी मरा नहीं - वह छुपा हुआ था।",
+      "हीरो को पता चलता है कि उनके पास अलौकिक शक्तियां हैं।",
+      "अपराध स्थल पीड़ित ने खुद ही रचा था।",
+      "हीरो गोद लिया गया था और उसके असली माता-पिता विलेन हैं।",
+      "पूरी कहानी एक सपना है - या है?",
+      "हीरो की यादें पूरी तरह झूठी हैं।"
+    ]
+  },
+  "identity": {
+    "en": [
+      "The detective is actually the criminal they're hunting.",
+      "The long-lost parent is actually the villain.",
+      "The best friend has been impersonating someone else.",
+      "The hero and villain are the same person with split personality.",
+      "The witness is actually the one who committed the crime.",
+      "The hero is a clone and doesn't know it.",
+      "The sidekick is the real chosen one, not the hero.",
+      "The ruler is an imposter; the real one is imprisoned.",
+      "The hero's memories have been implanted.",
+      "The monster they fear is actually their own reflection.",
+      "The hero was the villain all along but had amnesia.",
+      "The rescuer is the one who created the danger.",
+      "The therapist is manipulating everyone's memories.",
+      "The 'hero' is actually the villain of someone else's story."
+    ],
+    "hi": [
+      "जासूस असल में वही अपराधी है जिसे वह ढूंढ रहा है।",
+      "खोया हुआ माता-पिता असल में विलेन है।",
+      "सबसे अच्छा दोस्त किसी और का रूप धारण कर रहा है।",
+      "हीरो और विलेन एक ही व्यक्ति हैं जिनका व्यक्तित्व विभाजित है।",
+      "गवाह असल में वही है जिसने अपराध किया।",
+      "हीरो क्लोन है और उसे पता नहीं।",
+      "साथी असली चुना हुआ है, हीरो नहीं।"
+    ]
+  },
+  "time": {
+    "en": [
+      "The events have been happening in a time loop.",
+      "The story is actually happening in the past/future.",
+      "Time is moving backward without anyone noticing.",
+      "The key doesn't open doors - it travels through time.",
+      "The same day keeps repeating with small changes.",
+      "They've been dead the whole time and this is the afterlife.",
+      "Time speeds up for everyone except the hero.",
+      "The hero can see 5 seconds into the future.",
+      "Every time they die, they restart at a checkpoint.",
+      "The villain has been manipulating time to always win.",
+      "The hero is stuck in a single moment, reliving it forever.",
+      "Time freezes but only the hero remains mobile.",
+      "The clock is counting down to something unexpected."
+    ],
+    "hi": [
+      "सब कुछ समय चक्र में हो रहा है।",
+      "कहानी असल में अतीत या भविष्य में घटित हो रही है।",
+      "समय पीछे की ओर बढ़ रहा है और किसी को पता नहीं।",
+      "चाबी दरवाजे नहीं खोलती - यह समय यात्रा कराती है।",
+      "वही दिन छोटे बदलावों के साथ दोहराया जा रहा है।",
+      "वे हर समय मृत थे और यह मृत्यु के बाद का जीवन है।"
+    ]
+  },
+  "suspense": {
+    "en": [
+      "Someone is watching them from the shadows.",
+      "The safe place is actually the most dangerous.",
+      "A trusted object is actually a surveillance device.",
+      "The phone calls are coming from inside the house.",
+      "They are not alone - something has been following them.",
+      "The mirror reflection doesn't match the person.",
+      "Every photograph has the same stranger in the background.",
+      "The doors lock automatically at night.",
+      "The noise is coming from inside the walls.",
+      "Someone has been living in the attic without their knowledge.",
+      "The security cameras show empty rooms, but they're not alone.",
+      "The lights flicker whenever 'it' is near.",
+      "Footprints appear leading nowhere.",
+      "The child draws pictures of things that haven't happened yet."
+    ],
+    "hi": [
+      "कोई अंधेरे से उन्हें देख रहा है।",
+      "सुरक्षित जगह असल में सबसे खतरनाक है।",
+      "एक भरोसेमंद वस्तु असल में निगरानी उपकरण है।",
+      "फोन कॉल घर के अंदर से आ रहे हैं।",
+      "वे अकेले नहीं हैं - कुछ उनका पीछा कर रहा है।",
+      "दर्पण का प्रतिबिंब व्यक्ति से मेल नहीं खाता।"
+    ]
+  },
+  "moral_dilemma": {
+    "en": [
+      "Saving one person means sacrificing another.",
+      "The truth will destroy someone innocent.",
+      "The hero must choose between love and duty.",
+      "Doing the right thing has terrible consequences.",
+      "The only way to win is to become like the villain.",
+      "Save the world or save their loved one - can't do both.",
+      "The cure is worse than the disease.",
+      "Killing the villain means becoming a killer themselves.",
+      "The hero must betray a friend to save thousands.",
+      "The secret must be kept to protect the innocent.",
+      "Succeeding means losing their humanity.",
+      "The hero must let someone die to save everyone else.",
+      "Forgiveness is possible, but justice demands punishment."
+    ],
+    "hi": [
+      "एक व्यक्ति को बचाने का मतलब दूसरे का बलिदान देना है।",
+      "सच्चाई किसी निर्दोष को नष्ट कर देगी।",
+      "हीरो को प्यार और कर्तव्य के बीच चुनाव करना होगा।",
+      "सही काम करने के भयानक परिणाम होते हैं।",
+      "जीतने का एकमात्र तरीका विलेन की तरह बनना है।",
+      "दुनिया बचाओ या अपने प्रिय को - दोनों संभव नहीं।"
+    ]
+  },
+  "unexpected_ally": {
+    "en": [
+      "The villain's sidekick decides to help the hero.",
+      "The enemy of my enemy becomes a friend.",
+      "A stranger knows more about the hero than they should.",
+      "The person they were hunting joins forces with them.",
+      "The monster they feared is actually protecting them.",
+      "The rival team offers help when most needed.",
+      "The prisoner holds the key to escape.",
+      "The creature they saved returns to rescue them.",
+      "The outcast has the exact skills needed.",
+      "The former enemy becomes their greatest protector.",
+      "The ghost of the past returns to guide them.",
+      "The villain's child rebels against their parent."
+    ],
+    "hi": [
+      "विलेन का साथी हीरो की मदद करने का फैसला करता है।",
+      "दुश्मन का दुश्मन दोस्त बन जाता है।",
+      "एक अजनबी हीरो के बारे में बहुत कुछ जानता है।",
+      "जिसका वे शिकार कर रहे थे, वह उनके साथ आ जाता है।",
+      "जिस राक्षस से वे डरते थे, वह असल में उनकी रक्षा कर रहा है।"
+    ]
+  },
+  "romance": {
+    "en": [
+      "The love interest is from the enemy side.",
+      "They were betrothed as children but don't know it.",
+      "The hero must choose between two loves.",
+      "The relationship was just a mission, but became real.",
+      "They fall in love with the person they were supposed to kill.",
+      "The ex returns at the worst possible moment.",
+      "The love confession happens when death seems certain.",
+      "The letter was never delivered - until now.",
+      "They've been communicating without knowing each other's identity.",
+      "The wedding is interrupted by the villain.",
+      "One of them must leave forever to save the other.",
+      "They meet again after years, but everything has changed.",
+      "Love is the only weapon that can defeat the enemy."
+    ],
+    "hi": [
+      "प्रेम दिलचस्पी दुश्मन पक्ष से है।",
+      "बचपन में उनकी सगाई हुई थी लेकिन उन्हें पता नहीं।",
+      "हीरो को दो प्यारों के बीच चुनाव करना होगा।",
+      "रिश्ता सिर्फ एक मिशन था, लेकिन सच्चा हो गया।",
+      "वे उस व्यक्ति से प्यार करते हैं जिसे मारना था।",
+      "पूर्व प्रेमी सबसे बुरे समय में लौटता है।"
+    ]
+  },
+  "comedy": {
+    "en": [
+      "The powerful villain is afraid of something silly.",
+      "The hero's plan works, but not in the way expected.",
+      "They've been arguing while the solution was obvious.",
+      "The dramatic moment is interrupted by something ridiculous.",
+      "The secret weapon is something embarrassingly ordinary.",
+      "Everyone misunderstood the prophecy completely.",
+      "The big villain reveal is someone they already pranked.",
+      "The chase ends because both are exhausted and give up.",
+      "The treasure turns out to be worthless but sentimental.",
+      "The scary monster just wants to be friends.",
+      "The hero keeps trying to be dramatic but fails hilariously.",
+      "The sidekick is way more competent than the hero.",
+      "The villain quits because of bad work-life balance."
+    ],
+    "hi": [
+      "शक्तिशाली विलेन किसी बेवकूफी भरी चीज से डरता है।",
+      "हीरो की योजना काम करती है, लेकिन उम्मीद के मुताबिक नहीं।",
+      "वे बहस कर रहे थे जबकि समाधान स्पष्ट था।",
+      "नाटकीय क्षण किसी हास्यास्पद चीज से बाधित होता है।",
+      "गुप्त हथियार कुछ शर्मनाक साधारण है।",
+      "सभी ने भविष्यवाणी को पूरी तरह गलत समझा।"
+    ]
+  },
+  "scifi": {
+    "en": [
+      "The world is actually a simulation.",
+      "The hero is an AI that doesn't know it.",
+      "The aliens have been observing humans as an experiment.",
+      "The technology they use is actually ancient alien artifact.",
+      "The mission to save Earth was a test for colonization.",
+      "Time travel caused the problem they're trying to fix.",
+      "The memories are neural implants, not real experiences.",
+      "The dystopian world is Earth after an unseen disaster.",
+      "The 'magic' is actually advanced technology.",
+      "They're not on Earth; they've been on another planet.",
+      "The human race is extinct; these are robots with memories.",
+      "The villain is trying to prevent a worse future.",
+      "Parallel versions of themselves are invading."
+    ],
+    "hi": [
+      "दुनिया असल में एक सिमुलेशन है।",
+      "हीरो एक एआई है जो इसे नहीं जानता।",
+      "एलियंस मनुष्यों को एक प्रयोग के रूप में देख रहे हैं।",
+      "वे जिस तकनीक का उपयोग कर रहे हैं, वह असल में प्राचीन एलियन कलाकृति है।",
+      "पृथ्वी को बचाने का मिशन उपनिवेशीकरण के लिए एक परीक्षण था।"
+    ]
+  },
+  "horror": {
+    "en": [
+      "The monster is already inside the house.",
+      "The curse is passed on by knowing about it.",
+      "The victims are all connected in a way they don't realize.",
+      "The haunting is caused by guilt, not ghosts.",
+      "The evil entity was summoned by the survivors themselves.",
+      "Every door leads to the same room.",
+      "The reflection shows something different every time.",
+      "The photograph subjects move when not watched.",
+      "The phone rings, but it's from their own number.",
+      "The dead are not at rest because of an unfulfilled promise.",
+      "The house is alive and feeding on their fear.",
+      "They've been dead since the first scene.",
+      "The monster is a manifestation of their collective fear."
+    ],
+    "hi": [
+      "राक्षस पहले से ही घर के अंदर है।",
+      "इसके बारे में जानने मात्र से अभिशाप फैलता है।",
+      "पीड़ित सभी किसी न किसी तरह जुड़े हुए हैं जिसे वे नहीं जानते।",
+      "भूत-प्रेत नहीं, बल्कि अपराधबोध प्रेतवाधित कर रहा है।",
+      "बुरी आत्मा को बचे हुए लोगों ने खुद बुलाया था।"
+    ]
+  },
+  "thriller": {
+    "en": [
+      "The protagonist is being framed for a crime they didn't commit.",
+      "The trusted authority figure is the mastermind.",
+      "Every clue leads to a dead end - literally.",
+      "The chase is happening in a confined space.",
+      "The timer is counting down, but to what?",
+      "The hero is running out of time and options.",
+      "The conspiracy goes higher than anyone imagined.",
+      "The witness saw too much and now they're being hunted.",
+      "The safe house isn't safe anymore.",
+      "The hunter becomes the hunted.",
+      "The police are part of the conspiracy.",
+      "The hero's partner is the mole.",
+      "Every phone call is being monitored."
+    ],
+    "hi": [
+      "नायक को ऐसे अपराध के लिए फंसाया जा रहा है जो उसने नहीं किया।",
+      "भरोसेमंद अधिकारी ही साजिश का मास्टरमाइंड है।",
+      "हर सुराग एक मृत अंत तक ले जाता है - वस्तुतः।",
+      "पीछा एक सीमित स्थान में हो रहा है।",
+      "टाइमर टिक रहा है, लेकिन किस लिए?"
+    ]
+  },
+  "fantasy": {
+    "en": [
+      "The prophecy was misinterpreted.",
+      "The magic comes with a terrible price.",
+      "The chosen one refuses their destiny.",
+      "The magical creature is actually a transformed human.",
+      "The artifact they seek was destroyed long ago.",
+      "The villain was once a hero who was betrayed.",
+      "The fantasy world is collapsing into the real world.",
+      "The magic only works because they believe in it.",
+      "The mythical creature is real and living among them.",
+      "The quest was never meant to be completed.",
+      "The 'evil' kingdom was actually peaceful all along.",
+      "The gods are real and they're not benevolent.",
+      "Magic is fading and cannot be saved."
+    ],
+    "hi": [
+      "भविष्यवाणी की गलत व्याख्या की गई थी।",
+      "जादू की भयानक कीमत चुकानी पड़ती है।",
+      "चुना हुआ व्यक्ति अपने भाग्य को अस्वीकार कर देता है।",
+      "जादुई प्राणी असल में एक रूपांतरित मानव है।",
+      "वे जिस कलाकृति की खोज कर रहे हैं, वह बहुत पहले नष्ट हो गई थी।"
+    ]
+  }
+}
