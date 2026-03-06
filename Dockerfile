@@ -12,19 +12,23 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
+# Copy requirements first (for better caching)
 COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
+# Copy the entire project
 COPY . .
+
+# Make sure we're in the right directory
+RUN ls -la && pwd
 
 # Expose port
 EXPOSE 5000
 
-# CORRECT COMMAND - no extra characters!
-CMD ["python", "app.py"]
+# Run the application - using 0.0.0.0 to be accessible from host
+CMD ["python", "backend/app.py"]

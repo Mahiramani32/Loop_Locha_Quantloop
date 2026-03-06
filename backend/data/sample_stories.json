@@ -1,0 +1,16 @@
+{
+  "stories": [
+    {
+      "id": "story1",
+      "title": "The Lost Key",
+      "content": "In a small town, Emma finds an old key that leads to a mysterious door. She must solve puzzles and face her fears to discover what lies behind it.",
+      "genre": "mystery"
+    },
+    {
+      "id": "story2",
+      "title": "Last Chance",
+      "content": "A struggling musician gets one final opportunity to make her dream come true. But the price might be higher than she imagined.",
+      "genre": "drama"
+    }
+  ]
+}

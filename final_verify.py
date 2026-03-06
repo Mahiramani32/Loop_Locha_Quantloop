@@ -7,6 +7,10 @@ import json
 import time
 import sys
 import subprocess
+import os
+
+# Add backend folder to path so we can import app if needed
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
 
 BASE_URL = "http://localhost:5000/api"
 
@@ -182,3 +186,10 @@ print("📚 Endpoints:")
 print("   - GET  /health")
 print("   - POST /validate")
 print("   - POST /analyze")
+
+# Optional: Test if we can import app (just to verify path)
+try:
+    from app import app
+    print("\n✅ Backend module import successful!")
+except Exception as e:
+    print(f"\n⚠️ Note: Could not import app module (but API tests may still work): {e}")
