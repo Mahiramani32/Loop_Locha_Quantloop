@@ -21,11 +21,17 @@ print("📝 TEST 1: LANGUAGE DETECTION")
 print("=" * 70)
 
 test_texts = [
-    "Hello, how are you? This is a test in English.",
-    "नमस्ते, आप कैसे हैं? यह हिंदी में एक परीक्षण है।",
-    "வணக்கம், எப்படி இருக்கிறீர்கள்? இது தமிழில் ஒரு சோதனை.",
-    "Bonjour, comment allez-vous? Je vais très bien aujourd'hui."
-]
+        "Hello, how are you? I'm doing great today!", 
+        "नमस्ते, आप कैसे हैं? मैं आज बहुत अच्छा हूँ।", 
+        "வணக்கம், எப்படி இருக்கிறீர்கள்? நான் இன்று நன்றாக இருக்கிறேன்।", 
+        "Bonjour, comment allez-vous? Je vais très bien aujourd'hui.", 
+        "મારું નામ... છે.", 
+        "¿Cómo estás? Muy bien, gracias.",
+        "Wie geht es dir? Mir geht es gut.", 
+        "আমি ভালো আছি।", 
+        "ನಾನು ಚೆನ್ನಾಗಿದ್ದೇನೆ.", 
+        "मी ठीक आहे.", 
+    ]
 
 for text in test_texts:
     lang = detect_language(text, return_name=True)
