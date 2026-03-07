@@ -47,11 +47,9 @@ const Results = () => {
   const saveStoryToDashboard = () => {
     try {
       const savedStories = JSON.parse(localStorage.getItem("stories") || "[]");
-      const cliffhangerScore =
-        analysisData.overall_scores?.cliffhanger_quality || 0;
-      const retentionScore =
-        analysisData.overall_scores?.retention_prediction || 0;
-      const avgScore = Math.round(cliffhangerScore * 50 + retentionScore * 50);
+      const cliffhangerScore = analysisData.overall_scores?.cliffhanger_quality || 0;
+      const retentionScore = analysisData.overall_scores?.retention_prediction || 0;
+      const avgScore = Math.round((cliffhangerScore * 50) + (retentionScore * 50));
 
       const newStory = {
         id: Date.now(),
@@ -75,13 +73,7 @@ const Results = () => {
 
   const prepareEmotionData = () => {
     if (!analysisData?.episodes?.length) return null;
-    const emotions = {
-      joy: [],
-      sadness: [],
-      anger: [],
-      fear: [],
-      surprise: [],
-    };
+    const emotions = { joy: [], sadness: [], anger: [], fear: [], surprise: [] };
 
     try {
       for (const episode of analysisData.episodes) {
@@ -89,13 +81,7 @@ const Results = () => {
         if (!arc) continue;
 
         if (Array.isArray(arc) && arc.length > 0) {
-          const epEmotions = {
-            joy: 0,
-            sadness: 0,
-            anger: 0,
-            fear: 0,
-            surprise: 0,
-          };
+          const epEmotions = { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0 };
           let count = 0;
 
           for (const point of arc) {
@@ -111,14 +97,10 @@ const Results = () => {
 
           if (count > 0) {
             emotions.joy.push(Math.round((epEmotions.joy / count) * 100));
-            emotions.sadness.push(
-              Math.round((epEmotions.sadness / count) * 100),
-            );
+            emotions.sadness.push(Math.round((epEmotions.sadness / count) * 100));
             emotions.anger.push(Math.round((epEmotions.anger / count) * 100));
             emotions.fear.push(Math.round((epEmotions.fear / count) * 100));
-            emotions.surprise.push(
-              Math.round((epEmotions.surprise / count) * 100),
-            );
+            emotions.surprise.push(Math.round((epEmotions.surprise / count) * 100));
           }
         }
       }
@@ -131,12 +113,10 @@ const Results = () => {
   };
 
   const emotionData = prepareEmotionData();
-  const cliffhangerDisplay = analysisData?.overall_scores?.cliffhanger_quality
-    ? Math.round(analysisData.overall_scores.cliffhanger_quality * 100)
-    : 0;
-  const retentionDisplay = analysisData?.overall_scores?.retention_prediction
-    ? Math.round(analysisData.overall_scores.retention_prediction * 100)
-    : 0;
+  const cliffhangerDisplay = analysisData?.overall_scores?.cliffhanger_quality 
+    ? Math.round(analysisData.overall_scores.cliffhanger_quality * 100) : 0;
+  const retentionDisplay = analysisData?.overall_scores?.retention_prediction 
+    ? Math.round(analysisData.overall_scores.retention_prediction * 100) : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-indigo-950 dark:to-purple-950 transition-colors duration-300 relative overflow-hidden">
@@ -185,9 +165,7 @@ const Results = () => {
             onClick={() => navigate("/")}
             className="px-6 py-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-800 dark:text-gray-200 rounded-lg font-semibold hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2 group"
           >
-            <span className="group-hover:-translate-x-1 transition-transform duration-300">
-              ←
-            </span>
+            <span className="group-hover:-translate-x-1 transition-transform duration-300">←</span>
             Back
           </button>
           <h1 className="text-3xl font-bold ml-4 bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 text-transparent bg-clip-text animate-pulse-slow">
@@ -208,12 +186,10 @@ const Results = () => {
               </p>
               <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-4">
                 <span className="flex items-center gap-1">
-                  <span className="animate-pulse">🌐</span>{" "}
-                  {analysisData.language || "en"}
+                  <span className="animate-pulse">🌐</span> {analysisData.language || "en"}
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="animate-pulse">📺</span>{" "}
-                  {analysisData.total_episodes} episodes
+                  <span className="animate-pulse">📺</span> {analysisData.total_episodes} episodes
                 </span>
                 {storySaved && (
                   <span className="ml-4 text-green-600 flex items-center gap-1 animate-bounce-subtle">
@@ -225,20 +201,14 @@ const Results = () => {
 
             {/* Scores Grid with animations */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div
-                className="animate-slide-up"
-                style={{ animationDelay: "0.2s" }}
-              >
+              <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
                 <ScoreMeter
                   label="Cliffhanger Score"
                   score={cliffhangerDisplay}
                   color="blue"
                 />
               </div>
-              <div
-                className="animate-slide-up"
-                style={{ animationDelay: "0.4s" }}
-              >
+              <div className="animate-slide-up" style={{ animationDelay: "0.4s" }}>
                 <ScoreMeter
                   label="Retention Score"
                   score={retentionDisplay}
@@ -267,22 +237,17 @@ const Results = () => {
                 </h2>
                 <div className="flex items-end h-40 gap-2">
                   {analysisData.retention_curve.map((value, idx) => (
-                    <div
-                      key={idx}
-                      className="flex-1 flex flex-col items-center group"
-                    >
+                    <div key={idx} className="flex-1 flex flex-col items-center group">
                       <div
                         className="w-full bg-gradient-to-t from-green-500 to-green-400 rounded-t-lg transform transition-all duration-700 hover:scale-y-110 hover:shadow-lg"
-                        style={{
-                          height: `${value * 100}%`,
+                        style={{ 
+                          height: `${value * 100}%`, 
                           minHeight: "4px",
-                          animation: `barGrow 0.5s ease-out ${idx * 0.1}s both`,
+                          animation: `barGrow 0.5s ease-out ${idx * 0.1}s both`
                         }}
                       />
                       <span className="text-xs mt-2">Ep {idx + 1}</span>
-                      <span className="text-xs font-semibold">
-                        {Math.round(value * 100)}%
-                      </span>
+                      <span className="text-xs font-semibold">{Math.round(value * 100)}%</span>
                     </div>
                   ))}
                 </div>
@@ -296,13 +261,9 @@ const Results = () => {
                 className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-purple-500/50 flex items-center gap-2 group relative overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">
-                    📺
-                  </span>
+                  <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">📺</span>
                   View Episodes
-                  <span className="text-2xl group-hover:translate-x-2 transition-transform duration-300">
-                    ✨
-                  </span>
+                  <span className="text-2xl group-hover:translate-x-2 transition-transform duration-300">✨</span>
                 </span>
                 <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
               </button>
@@ -311,11 +272,9 @@ const Results = () => {
         ) : (
           <div className="text-center py-20 animate-fade-in">
             <div className="text-8xl mb-4 animate-float">📊</div>
-            <p className="text-gray-500 dark:text-gray-400 text-xl mb-4">
-              No analysis data available.
-            </p>
-            <button
-              onClick={() => navigate("/")}
+            <p className="text-gray-500 dark:text-gray-400 text-xl mb-4">No analysis data available.</p>
+            <button 
+              onClick={() => navigate("/")} 
               className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-300 shadow-xl"
             >
               Analyze a Story ✨

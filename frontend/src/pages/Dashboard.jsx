@@ -66,25 +66,22 @@ const Dashboard = () => {
   };
 
   const getScoreColor = (score) => {
-    if (score >= 90)
-      return "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30";
-    if (score >= 70)
-      return "text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30";
+    if (score >= 90) return "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30";
+    if (score >= 70) return "text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30";
     return "text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30";
   };
 
   const filteredStories = stories.filter((story) =>
-    story.title.toLowerCase().includes(searchTerm.toLowerCase()),
+    story.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalStories = stories.length;
-  const avgScore =
-    totalStories > 0
-      ? Math.round(stories.reduce((acc, s) => acc + s.score, 0) / totalStories)
-      : 0;
+  const avgScore = totalStories > 0
+    ? Math.round(stories.reduce((acc, s) => acc + s.score, 0) / totalStories)
+    : 0;
   const bestStory = stories.reduce(
     (best, current) => (current.score > (best?.score || 0) ? current : best),
-    null,
+    null
   );
 
   return (
@@ -169,50 +166,22 @@ const Dashboard = () => {
         {!loading && totalStories > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 transform transition-all duration-500 hover:scale-105 hover:rotate-1 hover:shadow-2xl border border-amber-200 dark:border-purple-800 animate-float-card">
-              <div className="text-5xl mb-3 animate-bounce-slow text-amber-600 dark:text-purple-400">
-                📚
-              </div>
-              <h3 className="text-amber-700 dark:text-purple-300 text-sm font-semibold">
-                Total Stories
-              </h3>
-              <p className="text-4xl font-bold text-gray-800 dark:text-white">
-                {totalStories}
-              </p>
+              <div className="text-5xl mb-3 animate-bounce-slow text-amber-600 dark:text-purple-400">📚</div>
+              <h3 className="text-amber-700 dark:text-purple-300 text-sm font-semibold">Total Stories</h3>
+              <p className="text-4xl font-bold text-gray-800 dark:text-white">{totalStories}</p>
             </div>
-
-            <div
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 transform transition-all duration-500 hover:scale-105 hover:rotate-1 hover:shadow-2xl border border-amber-200 dark:border-purple-800 animate-float-card"
-              style={{ animationDelay: "0.2s" }}
-            >
-              <div className="text-5xl mb-3 animate-bounce-slow text-amber-600 dark:text-purple-400">
-                📊
-              </div>
-              <h3 className="text-amber-700 dark:text-purple-300 text-sm font-semibold">
-                Average Score
-              </h3>
-              <p className="text-4xl font-bold text-green-600 dark:text-green-400">
-                {avgScore}%
-              </p>
+            
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 transform transition-all duration-500 hover:scale-105 hover:rotate-1 hover:shadow-2xl border border-amber-200 dark:border-purple-800 animate-float-card" style={{ animationDelay: "0.2s" }}>
+              <div className="text-5xl mb-3 animate-bounce-slow text-amber-600 dark:text-purple-400">📊</div>
+              <h3 className="text-amber-700 dark:text-purple-300 text-sm font-semibold">Average Score</h3>
+              <p className="text-4xl font-bold text-green-600 dark:text-green-400">{avgScore}%</p>
             </div>
-
-            <div
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 transform transition-all duration-500 hover:scale-105 hover:rotate-1 hover:shadow-2xl border border-amber-200 dark:border-purple-800 animate-float-card"
-              style={{ animationDelay: "0.4s" }}
-            >
-              <div className="text-5xl mb-3 animate-bounce-slow text-amber-600 dark:text-purple-400">
-                🏆
-              </div>
-              <h3 className="text-amber-700 dark:text-purple-300 text-sm font-semibold">
-                Best Story
-              </h3>
-              <p className="text-lg font-bold text-purple-600 dark:text-purple-400">
-                {bestStory?.title || "N/A"}
-              </p>
-              {bestStory && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {bestStory.score}% score
-                </p>
-              )}
+            
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 transform transition-all duration-500 hover:scale-105 hover:rotate-1 hover:shadow-2xl border border-amber-200 dark:border-purple-800 animate-float-card" style={{ animationDelay: "0.4s" }}>
+              <div className="text-5xl mb-3 animate-bounce-slow text-amber-600 dark:text-purple-400">🏆</div>
+              <h3 className="text-amber-700 dark:text-purple-300 text-sm font-semibold">Best Story</h3>
+              <p className="text-lg font-bold text-purple-600 dark:text-purple-400">{bestStory?.title || "N/A"}</p>
+              {bestStory && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{bestStory.score}% score</p>}
             </div>
           </div>
         )}
@@ -236,13 +205,11 @@ const Dashboard = () => {
               <span className="text-3xl animate-wiggle">📖</span>
               Your Stories
             </h2>
-
+            
             {filteredStories.length === 0 ? (
               <div className="text-center py-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-amber-200 dark:border-purple-800">
                 <div className="text-7xl mb-4 animate-float">📚</div>
-                <p className="text-gray-600 dark:text-gray-400 text-xl mb-4">
-                  No stories yet...
-                </p>
+                <p className="text-gray-600 dark:text-gray-400 text-xl mb-4">No stories yet...</p>
                 <button
                   onClick={() => navigate("/")}
                   className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-purple-600 dark:to-pink-600 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
@@ -276,18 +243,16 @@ const Dashboard = () => {
                     <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2 group-hover:text-amber-600 dark:group-hover:text-purple-400 transition-colors">
                       {story.title}
                     </h3>
-
+                    
                     <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
                       {story.preview}
                     </p>
 
                     <div className="flex justify-between items-center">
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm font-semibold ${getScoreColor(story.score)}`}
-                      >
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getScoreColor(story.score)}`}>
                         {story.score}% Score
                       </span>
-
+                      
                       <span className="text-amber-600 dark:text-purple-400 text-sm font-medium flex items-center gap-1 group-hover:translate-x-2 transition-transform duration-300">
                         Read More
                         <span className="text-lg">→</span>
