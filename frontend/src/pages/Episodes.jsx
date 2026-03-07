@@ -1,69 +1,44 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useStory } from "../hooks/useStory";
 
 const Episodes = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [episodes, setEpisodes] = useState([]);
-  const [genre, setGenre] = useState("Thriller");
-  const [tone, setTone] = useState("Suspenseful");
   const [selectedEpisode, setSelectedEpisode] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [filmStrip, setFilmStrip] = useState([]);
 
-  // Get story data from location
+  // Film strip effect
+  useEffect(() => {
+    const strips = [];
+    for (let i = 0; i < 20; i++) {
+      strips.push({
+        id: i,
+        top: Math.random() * 100,
+        speed: 10 + Math.random() * 20,
+        delay: Math.random() * 5,
+      });
+    }
+    setFilmStrip(strips);
+  }, []);
+
   const story = location.state?.story || "";
   const storyTitle = location.state?.storyTitle || "Your Story";
-  const storyId = location.state?.storyId || null;
   const analysisData = location.state?.analysisData || null;
 
-  // Use analysis data if available
   useEffect(() => {
     const loadEpisodes = async () => {
       setLoading(true);
       try {
-        // If we have analysis data from Results page, use it
         if (analysisData && analysisData.episodes) {
-          console.log("Raw episode data from backend:", analysisData.episodes);
-
-          // Extract per-episode suggestions from the structured suggestions object
-          const allSuggestions = [];
-          if (analysisData.suggestions) {
-            const sug = analysisData.suggestions;
-            if (sug.critical || sug.improvement || sug.tips) {
-              ["critical", "improvement", "tips"].forEach((cat) => {
-                if (Array.isArray(sug[cat])) {
-                  sug[cat].forEach((s) => {
-                    if (s.text) allSuggestions.push({ ...s, category: cat });
-                  });
-                }
-              });
-            }
-          }
-
           const formattedEpisodes = analysisData.episodes.map((ep, index) => {
             const epNum = ep.episode_number || index + 1;
-
-            // Get the best available description - PRIORITIZE description field
-            let description = "";
-            if (ep.description && ep.description.trim() !== "") {
-              description = ep.description;
-              console.log(`Episode ${epNum}: Using description`);
-            } else if (ep.summary && ep.summary.trim() !== "") {
-              description = ep.summary;
-              console.log(`Episode ${epNum}: Using summary`);
-            } else if (ep.content && ep.content.trim() !== "") {
-              description = ep.content;
-              console.log(`Episode ${epNum}: Using content`);
-            } else {
-              description =
-                "No description available for this episode. Generate a new story to see more detailed episode plots.";
-            }
-
-            // Find suggestions for this episode
-            const episodeSuggestions = allSuggestions.filter(
-              (s) => s.episode === epNum,
-            );
+            const description =
+              ep.description ||
+              ep.summary ||
+              ep.content ||
+              "No description available.";
 
             return {
               id: epNum,
@@ -71,25 +46,17 @@ const Episodes = () => {
               title: ep.title || `Episode ${epNum}`,
               description: description,
               summary: ep.summary || "",
-              cliffhanger: ep.cliffhanger || "To be continued...",
-              emotional_arc: ep.emotional_arc || [],
+              cliffhanger: ep.cliffhanger || "",
               cliffhanger_score: ep.cliffhanger_score || 0,
               retention_score: ep.retention_score || 0,
-              genre: ep.genre || "general",
               twist_suggestions:
                 analysisData.twists?.find((t) => t.episode === epNum)?.twists ||
                 [],
-              suggestions: episodeSuggestions,
             };
           });
 
-          console.log("Formatted episodes:", formattedEpisodes);
           setEpisodes(formattedEpisodes);
           setSelectedEpisode(formattedEpisodes[0]);
-        }
-        // Otherwise fetch from backend using story ID (future implementation)
-        else if (storyId) {
-          console.log("Fetch episodes by ID:", storyId);
         }
       } catch (error) {
         console.error("Error loading episodes:", error);
@@ -99,406 +66,358 @@ const Episodes = () => {
     };
 
     loadEpisodes();
-  }, [analysisData, storyId]);
-
-  const genres = [
-    "Thriller",
-    "Mystery",
-    "Romance",
-    "Sci-Fi",
-    "Fantasy",
-    "Horror",
-    "Drama",
-    "Comedy",
-  ];
-  const tones = [
-    "Suspenseful",
-    "Dark",
-    "Light-hearted",
-    "Mysterious",
-    "Action-packed",
-    "Emotional",
-    "Humorous",
-    "Serious",
-  ];
+  }, [analysisData]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 relative overflow-hidden">
-      {/* Floating Emojis Background */}
-      <div className="fixed inset-0 pointer-events-none opacity-10 dark:opacity-20">
-        {["📺", "🎬", "📽️", "🎭", "📝", "✨"].map((emoji, i) => (
-          <span
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 dark:from-black dark:via-purple-950 dark:to-black transition-colors duration-300 relative overflow-hidden">
+      {/* Film Strip Background Animation */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {filmStrip.map((strip) => (
+          <div
+            key={strip.id}
+            className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent"
+            style={{
+              top: `${strip.top}%`,
+              animation: `filmStrip ${strip.speed}s linear infinite`,
+              animationDelay: `${strip.delay}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Floating Film Reels */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {[...Array(6)].map((_, i) => (
+          <div
             key={i}
-            className="absolute text-8xl animate-float"
+            className="absolute text-8xl opacity-5 animate-float-reel"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: `${3 + i}s`,
+              animationDelay: `${i * 2}s`,
+              animationDuration: `${15 + i * 5}s`,
             }}
           >
-            {emoji}
-          </span>
+            🎞️
+          </div>
         ))}
       </div>
 
       {/* Main Content */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header with Back Button */}
-        <div className="flex items-center mb-6 animate-fade-in">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header with film clapper animation */}
+        <div className="flex items-center mb-6 animate-clapper">
           <button
             onClick={() => navigate(-1)}
-            className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transform hover:scale-105 transition-all duration-300"
+            className="px-6 py-2 bg-white/10 backdrop-blur-md text-white rounded-lg font-semibold hover:bg-white/20 transform hover:scale-105 transition-all duration-300 border border-purple-500/30 hover:border-purple-500/50 flex items-center gap-2 group"
           >
-            ← Back
+            <span className="group-hover:-translate-x-1 transition-transform">
+              ←
+            </span>
+            Back to Results
           </button>
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white ml-4">
-            Story Episodes
+          <h1 className="text-3xl font-bold ml-4 text-white flex items-center gap-3">
+            <span className="text-4xl animate-spin-slow">🎬</span>
+            Episode Guide
           </h1>
         </div>
 
-        {/* Story Title */}
-        <div className="mb-4 text-gray-600 dark:text-gray-400 animate-slide-up">
-          <span className="font-medium">Story:</span> {storyTitle}
+        {/* Story Title with reel effect */}
+        <div className="mb-6 text-purple-300 animate-reveal flex items-center gap-2">
+          <span className="text-2xl">📽️</span>
+          <span className="font-medium">Now Playing:</span> {storyTitle}
         </div>
 
-        {/* Story Preview Card */}
-        {story && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 mb-6 border border-gray-100 dark:border-gray-700 animate-slide-up">
-            <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2">
-              <span className="text-blue-600 dark:text-blue-400 mr-2">📖</span>
-              {typeof story === "string"
-                ? story.substring(0, 150) + "..."
-                : "Your story"}
-            </p>
-          </div>
-        )}
-
-        {/* Controls Row */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-2xl animate-slide-up">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            {/* Genre Dropdown */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Genre
-              </label>
-              <select
-                value={genre}
-                onChange={(e) => setGenre(e.target.value)}
-                className="w-full p-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 
-                         bg-white dark:bg-gray-900 text-gray-800 dark:text-white
-                         focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 
-                         outline-none transition-all"
-              >
-                {genres.map((g) => (
-                  <option key={g} value={g}>
-                    {g}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Episodes Info - DYNAMIC COUNT */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Episodes
-              </label>
-              <div className="p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 rounded-lg text-gray-800 dark:text-white font-semibold border-2 border-gray-200 dark:border-gray-700">
-                {loading ? "Loading..." : `${episodes.length} Episodes`}
-              </div>
-            </div>
-
-            {/* Tone Dropdown */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Tone
-              </label>
-              <select
-                value={tone}
-                onChange={(e) => setTone(e.target.value)}
-                className="w-full p-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 
-                         bg-white dark:bg-gray-900 text-gray-800 dark:text-white
-                         focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 
-                         outline-none transition-all"
-              >
-                {tones.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Generate Button */}
-            <div>
-              <button
-                onClick={() => {
-                  alert(
-                    "Regenerate feature coming soon! This will use the backend to create new episodes with different genre/tone.",
-                  );
-                }}
-                className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-              >
-                Regenerate Arc <span className="ml-2">✨</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Loading State */}
+        {/* Loading State with film reel spinner */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+            <div className="relative">
+              <div className="w-20 h-20 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-3xl animate-pulse">🎬</span>
+              </div>
+            </div>
           </div>
         ) : (
-          /* Two Column Layout - Episodes List + Selected Episode Detail */
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Episodes List - Left Column */}
-            <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 border border-gray-100 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 px-2">
-                  Episodes ({episodes.length})
-                </h2>
-                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                  {episodes.map((ep, index) => (
-                    <button
-                      key={ep.id}
-                      onClick={() => setSelectedEpisode(ep)}
-                      className={`w-full text-left p-4 rounded-xl transition-all duration-300 transform hover:scale-102
-                                ${
-                                  selectedEpisode?.id === ep.id
-                                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                                    : "bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md"
-                                }`}
-                    >
-                      <div className="font-medium flex items-center text-lg mb-1">
-                        <span className="mr-2">📺</span>
-                        Episode {ep.number || index + 1}:{" "}
-                        {ep.title.replace(/^Episode \d+:\s*/, "")}
-                      </div>
-                      <div
-                        className={`text-sm text-left mt-2 ${selectedEpisode?.id === ep.id ? "text-blue-100" : "text-gray-600 dark:text-gray-300"} ${selectedEpisode?.id !== ep.id && "line-clamp-2"}`}
-                      >
-                        <span className="font-semibold">Summary:</span>{" "}
-                        {ep.summary || ep.description}
-                      </div>
-                      {ep.cliffhanger && (
-                        <div
-                          className={`text-sm text-left mt-1 line-clamp-2 ${selectedEpisode?.id === ep.id ? "text-yellow-100" : "text-gray-600 dark:text-gray-300"}`}
-                        >
-                          <span
-                            className={`font-semibold ${selectedEpisode?.id === ep.id ? "text-yellow-200" : "text-amber-600 dark:text-amber-400"}`}
-                          >
-                            Cliffhanger:
-                          </span>{" "}
-                          {ep.cliffhanger}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 mt-3 flex-wrap">
-                        {ep.cliffhanger_score > 0 && (
-                          <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                            ⚡ Cliff: {(ep.cliffhanger_score * 100).toFixed(0)}%
-                          </span>
-                        )}
-                        {ep.retention_score > 0 && (
-                          <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
-                            📈 Ret: {(ep.retention_score * 100).toFixed(0)}%
-                          </span>
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
+          <>
+            {/* Episode count banner */}
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 mb-8 border border-purple-500/30 animate-slide-down">
+              <div className="text-center">
+                <span className="text-2xl font-bold text-white flex items-center justify-center gap-4">
+                  <span className="text-3xl animate-bounce">🎬</span>
+                  {episodes.length} Episodes in This Season
+                  <span className="text-3xl animate-bounce animation-delay-200">
+                    🎬
+                  </span>
+                </span>
               </div>
             </div>
 
-            {/* Selected Episode Detail - Right Column */}
-            <div className="lg:col-span-2">
-              {selectedEpisode && (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 transform transition-all duration-300 hover:shadow-2xl">
-                  {/* Episode Header */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-                        {selectedEpisode.title}
-                      </h2>
-                      <p className="text-gray-600 dark:text-gray-400 flex items-center">
-                        <span className="mr-2">📺</span>
-                        Episode{" "}
-                        {selectedEpisode.number ||
-                          episodes.findIndex(
-                            (e) => e.id === selectedEpisode.id,
-                          ) + 1}{" "}
-                        of {episodes.length}
-                      </p>
-                      {selectedEpisode.cliffhanger_score > 0 && (
-                        <div className="flex gap-4 mt-2">
-                          <span className="text-sm px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                            Cliffhanger:{" "}
-                            {(selectedEpisode.cliffhanger_score * 100).toFixed(
-                              0,
-                            )}
-                            %
+            {/* Two Column Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Column - Episode List */}
+              <div className="lg:col-span-1">
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-purple-500/30 animate-slide-right">
+                  <h2 className="text-xl font-bold text-white mb-4 px-2 flex items-center gap-2">
+                    <span className="text-2xl">📋</span>
+                    Episode List
+                  </h2>
+                  <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    {episodes.map((ep, index) => (
+                      <button
+                        key={ep.id}
+                        onClick={() => setSelectedEpisode(ep)}
+                        className={`w-full text-left p-4 rounded-xl transition-all duration-500 transform hover:scale-102
+                                  ${
+                                    selectedEpisode?.id === ep.id
+                                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl scale-105 border-2 border-white"
+                                      : "bg-white/5 text-gray-300 hover:bg-white/10 hover:scale-102 border border-purple-500/20"
+                                  } animate-slide-up`}
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <div className="font-bold flex items-center text-lg mb-1">
+                          <span className="mr-2 text-2xl">▶️</span>
+                          Episode {ep.number}
+                        </div>
+                        <div className="text-sm text-left mt-2 line-clamp-2 text-gray-400">
+                          {ep.summary ||
+                            ep.description.substring(0, 80) + "..."}
+                        </div>
+                        <div className="flex items-center gap-2 mt-3">
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              selectedEpisode?.id === ep.id
+                                ? "bg-white/20 text-white"
+                                : "bg-purple-900/30 text-purple-300"
+                            }`}
+                          >
+                            ⚡ Cliffhanger:{" "}
+                            {(ep.cliffhanger_score * 100).toFixed(0)}%
                           </span>
-                          <span className="text-sm px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
-                            Retention:{" "}
-                            {(selectedEpisode.retention_score * 100).toFixed(0)}
-                            %
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              selectedEpisode?.id === ep.id
+                                ? "bg-white/20 text-white"
+                                : "bg-pink-900/30 text-pink-300"
+                            }`}
+                          >
+                            📈 Retention:{" "}
+                            {(ep.retention_score * 100).toFixed(0)}%
                           </span>
                         </div>
-                      )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column - Selected Episode */}
+              <div className="lg:col-span-2">
+                {selectedEpisode && (
+                  <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 animate-slide-left">
+                    {/* Episode Header with film strip effect */}
+                    <div className="relative overflow-hidden rounded-xl mb-6">
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 animate-pulse"></div>
+                      <div className="relative p-6">
+                        <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                          <span className="text-4xl">🎬</span>
+                          {selectedEpisode.title}
+                        </h2>
+                        <p className="text-purple-300 flex items-center gap-2">
+                          <span>Episode {selectedEpisode.number}</span>
+                          <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                          <span>Season 1</span>
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        onClick={() =>
-                          alert("Regenerate episode feature coming soon!")
-                        }
-                        className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 text-sm font-medium"
-                      >
-                        🔄 Regenerate
-                      </button>
-                      <button
-                        onClick={() =>
-                          alert("Improve cliffhanger feature coming soon!")
-                        }
-                        className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 text-sm font-medium"
-                      >
-                        ⚡ Improve Cliffhanger
-                      </button>
-                      <button
-                        onClick={() => {
-                          // Export episode as text
-                          const element = document.createElement("a");
-                          const file = new Blob(
-                            [
-                              `${selectedEpisode.title}\n\n${selectedEpisode.description}`,
-                              selectedEpisode.cliffhanger
-                                ? `\n\nCliffhanger: ${selectedEpisode.cliffhanger}`
-                                : "",
-                            ],
-                            { type: "text/plain" },
-                          );
-                          element.href = URL.createObjectURL(file);
-                          element.download = `episode-${selectedEpisode.number || 1}.txt`;
-                          document.body.appendChild(element);
-                          element.click();
-                        }}
-                        className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 text-sm font-medium shadow-md"
-                      >
-                        📤 Export
-                      </button>
+                    {/* Score Cards */}
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className="bg-white/5 rounded-xl p-4 border border-purple-500/30 transform hover:scale-105 transition-transform duration-300">
+                        <div className="text-2xl mb-2">⚡</div>
+                        <div className="text-sm text-gray-400">
+                          Cliffhanger Intensity
+                        </div>
+                        <div className="text-2xl font-bold text-purple-400">
+                          {(selectedEpisode.cliffhanger_score * 100).toFixed(0)}
+                          %
+                        </div>
+                      </div>
+                      <div className="bg-white/5 rounded-xl p-4 border border-pink-500/30 transform hover:scale-105 transition-transform duration-300">
+                        <div className="text-2xl mb-2">📈</div>
+                        <div className="text-sm text-gray-400">
+                          Retention Rate
+                        </div>
+                        <div className="text-2xl font-bold text-pink-400">
+                          {(selectedEpisode.retention_score * 100).toFixed(0)}%
+                        </div>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Episode Content - Full Description */}
-                  <div className="prose dark:prose-invert max-w-none bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed max-w-none text-base">
-                      <span className="font-semibold block mb-2 text-gray-900 dark:text-white">
-                        Full Description:
-                      </span>
-                      {selectedEpisode.description}
-                    </p>
-                  </div>
-
-                  {/* Twist Suggestions from backend */}
-                  {selectedEpisode.twist_suggestions &&
-                    selectedEpisode.twist_suggestions.length > 0 && (
-                      <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl border border-purple-200 dark:border-purple-800">
-                        <h3 className="text-sm font-semibold text-purple-800 dark:text-purple-300 mb-2 flex items-center">
-                          <span className="mr-2">🎭</span>
-                          Plot Twists
-                        </h3>
-                        <ul className="space-y-2">
-                          {selectedEpisode.twist_suggestions.map(
-                            (twist, idx) => (
-                              <li key={idx} className="flex items-start gap-2">
-                                <span className="text-purple-600 mt-1">✨</span>
-                                <span className="text-purple-700 dark:text-purple-400 text-sm">
-                                  {twist.text || twist}
-                                </span>
-                              </li>
-                            ),
-                          )}
-                        </ul>
-                      </div>
-                    )}
-
-                  {/* AI Suggestions for this episode */}
-                  {selectedEpisode.suggestions &&
-                    selectedEpisode.suggestions.length > 0 && (
-                      <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                        <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2 flex items-center">
-                          <span className="mr-2">💡</span>
-                          Suggestions
-                        </h3>
-                        <ul className="space-y-2">
-                          {selectedEpisode.suggestions.map((sug, idx) => (
-                            <li key={idx} className="flex items-start gap-2">
-                              <span
-                                className={`mt-1 ${
-                                  sug.category === "critical"
-                                    ? "text-red-500"
-                                    : sug.category === "improvement"
-                                      ? "text-yellow-500"
-                                      : "text-blue-500"
-                                }`}
-                              >
-                                •
-                              </span>
-                              <span className="text-blue-700 dark:text-blue-400 text-sm">
-                                {sug.text || sug}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                  {/* Cliffhanger Preview */}
-                  {selectedEpisode.cliffhanger && (
-                    <div className="mt-6 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 rounded-xl border border-yellow-200 dark:border-yellow-800">
-                      <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-300 mb-2 flex items-center">
-                        <span className="mr-2">⚡</span>
-                        Cliffhanger Ending
+                    {/* Full Description with typewriter effect */}
+                    <div className="bg-black/30 rounded-xl p-6 mb-6 border border-purple-500/30 animate-glow">
+                      <h3 className="text-purple-400 font-semibold mb-3 flex items-center gap-2">
+                        <span className="text-xl">📝</span>
+                        Scene Details
                       </h3>
-                      <p className="text-yellow-700 dark:text-yellow-400 text-sm">
-                        {selectedEpisode.cliffhanger}
+                      <p className="text-gray-300 leading-relaxed animate-typewriter">
+                        {selectedEpisode.description}
                       </p>
                     </div>
-                  )}
-                </div>
-              )}
+
+                    {/* Cliffhanger with neon effect */}
+                    {selectedEpisode.cliffhanger && (
+                      <div className="bg-gradient-to-r from-purple-900/50 to-pink-900/50 rounded-xl p-6 mb-6 border-2 border-purple-500/50 animate-neon">
+                        <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                          <span className="text-2xl">⚡</span>
+                          Cliffhanger Ending
+                        </h3>
+                        <p className="text-purple-200 text-lg italic">
+                          "{selectedEpisode.cliffhanger}"
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Plot Twists with star effect */}
+                    {selectedEpisode.twist_suggestions?.length > 0 && (
+                      <div className="bg-black/30 rounded-xl p-6 border border-yellow-500/30">
+                        <h3 className="text-xl font-bold text-yellow-400 mb-4 flex items-center gap-2">
+                          <span className="text-2xl animate-pulse">⭐</span>
+                          Plot Twists
+                        </h3>
+                        <div className="space-y-3">
+                          {selectedEpisode.twist_suggestions.map(
+                            (twist, idx) => (
+                              <div
+                                key={idx}
+                                className="p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/20 transform hover:scale-105 hover:border-yellow-500/50 transition-all duration-300 animate-twist"
+                                style={{ animationDelay: `${idx * 0.2}s` }}
+                              >
+                                <p className="text-yellow-300">
+                                  {twist.text || twist}
+                                </p>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
 
-      {/* Custom scrollbar styles */}
-      <style jsx>{`
+      {/* Animation Keyframes */}
+      <style>{`
+        @keyframes filmStrip {
+          0% { transform: translateX(-100%); opacity: 0; }
+          10% { opacity: 0.5; }
+          90% { opacity: 0.5; }
+          100% { transform: translateX(100%); opacity: 0; }
+        }
+
+        @keyframes float-reel {
+          0% { transform: translate(0, 0) rotate(0deg); opacity: 0.05; }
+          25% { transform: translate(50px, -30px) rotate(90deg); opacity: 0.1; }
+          50% { transform: translate(100px, 0) rotate(180deg); opacity: 0.05; }
+          75% { transform: translate(50px, 30px) rotate(270deg); opacity: 0.1; }
+          100% { transform: translate(0, 0) rotate(360deg); opacity: 0.05; }
+        }
+
+        @keyframes clapper {
+          0% { transform: rotate(-5deg) scale(0.95); opacity: 0; }
+          50% { transform: rotate(5deg) scale(1.05); }
+          100% { transform: rotate(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes reveal {
+          from { clip-path: inset(0 100% 0 0); }
+          to { clip-path: inset(0 0 0 0); }
+        }
+
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+          50% { box-shadow: 0 0 40px rgba(168, 85, 247, 0.6); }
+        }
+
+        @keyframes neon {
+          0%, 100% { border-color: rgba(168, 85, 247, 0.5); box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+          50% { border-color: rgba(236, 72, 153, 0.8); box-shadow: 0 0 40px rgba(236, 72, 153, 0.6); }
+        }
+
+        @keyframes twist {
+          0% { transform: scale(0.95); opacity: 0; }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slide-right {
+          from { transform: translateX(-50px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slide-left {
+          from { transform: translateX(50px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+
+        .animate-float-reel {
+          animation: float-reel linear infinite;
+        }
+
+        .animate-clapper {
+          animation: clapper 0.8s ease-out forwards;
+        }
+
+        .animate-reveal {
+          animation: reveal 1s ease-out forwards;
+        }
+
+        .animate-glow {
+          animation: glow 3s ease-in-out infinite;
+        }
+
+        .animate-neon {
+          animation: neon 2s ease-in-out infinite;
+        }
+
+        .animate-twist {
+          animation: twist 0.5s ease-out forwards;
+        }
+
+        .animate-slide-right {
+          animation: slide-right 0.6s ease-out forwards;
+        }
+
+        .animate-slide-left {
+          animation: slide-left 0.6s ease-out forwards;
+        }
+
+        .animate-slide-down {
+          animation: slide-down 0.6s ease-out forwards;
+        }
+
+        @keyframes slide-down {
+          from { transform: translateY(-30px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f1f1;
+          background: rgba(255,255,255,0.1);
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e0;
+          background: rgba(168, 85, 247, 0.5);
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #94a3b8;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-track {
-          background: #2d3748;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #4a5568;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #718096;
+          background: rgba(168, 85, 247, 0.8);
         }
       `}</style>
     </div>

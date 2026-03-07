@@ -3,7 +3,6 @@
  * Base URL: http://localhost:5000/api
  */
 
-// For development with backend on port 5000
 const API_BASE_URL = "http://localhost:5000/api";
 
 /**

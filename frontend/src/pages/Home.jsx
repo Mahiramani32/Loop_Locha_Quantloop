@@ -79,28 +79,21 @@ const Home = () => {
     setValidationMessage("");
 
     try {
-      console.log("Sending request to backend...");
       const data = await analyzeStory(story, title, episodes);
-      console.log("Received response:", data);
 
       if (data && data.success) {
-        console.log("Navigation to results with data:", data.data);
-        // Use setTimeout to ensure state is updated
-        setTimeout(() => {
-          navigate("/results", {
-            state: {
-              story,
-              storyTitle: title,
-              analysisData: data.data,
-            },
-          });
-        }, 100);
+        navigate("/results", {
+          state: {
+            story,
+            storyTitle: title || "Untitled Story",
+            analysisData: data.data,
+          },
+        });
       } else {
         setError(data?.error || "Analysis failed");
         setLoading(false);
       }
     } catch (err) {
-      console.error("Analysis error:", err);
       setError(err.message);
       setLoading(false);
     }
@@ -187,14 +180,8 @@ const Home = () => {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 This may take a few moments...
               </p>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
-                <div
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full animate-pulse"
-                  style={{ width: "60%" }}
-                ></div>
-              </div>
               <p className="text-sm text-gray-500 dark:text-gray-500">
-                Processing emotions, cliffhangers, and plot twists
+                Processing emotions and cliffhangers
               </p>
             </div>
           </div>
@@ -227,35 +214,27 @@ const Home = () => {
             Paste your story and get AI-powered insights about{" "}
             <span className="text-blue-600 dark:text-blue-400 font-semibold px-2 py-1 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
               emotions
-            </span>
-            ,{" "}
+            </span>{" "}
+            and{" "}
             <span className="text-purple-600 dark:text-purple-400 font-semibold px-2 py-1 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
               cliffhangers
-            </span>
-            ,{" "}
-            <span className="text-pink-600 dark:text-pink-400 font-semibold px-2 py-1 bg-pink-50 dark:bg-pink-900/30 rounded-lg">
-              retention
-            </span>
-            , and{" "}
-            <span className="text-indigo-600 dark:text-indigo-400 font-semibold px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
-              plot twists
             </span>
           </p>
         </div>
 
-        {/* Feature Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {/* Feature Cards - REMOVED Smart Suggestions */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
           {[
             {
               emoji: "📊",
               title: "Emotion Analysis",
-              desc: "Track 5 emotions throughout your story",
+              desc: "Track emotions throughout your story",
               color: "from-blue-400 to-blue-600",
             },
             {
               emoji: "⚡",
               title: "Cliffhanger Score",
-              desc: "Measure suspense and engagement levels",
+              desc: "Measure suspense and engagement",
               color: "from-purple-400 to-purple-600",
             },
             {
@@ -263,12 +242,6 @@ const Home = () => {
               title: "Plot Twists",
               desc: "Get AI-powered twist suggestions",
               color: "from-indigo-400 to-indigo-600",
-            },
-            {
-              emoji: "💡",
-              title: "Smart Suggestions",
-              desc: "Actionable improvement tips",
-              color: "from-pink-400 to-pink-600",
             },
           ].map((card, i) => (
             <div
@@ -475,6 +448,17 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      {/* Snowfall animation */}
+      <style>{`
+        @keyframes snowfall {
+          0% { transform: translateY(0) rotate(0deg); }
+          100% { transform: translateY(100vh) rotate(360deg); }
+        }
+        .animate-snowfall {
+          animation: snowfall linear forwards;
+        }
+      `}</style>
     </div>
   );
 };

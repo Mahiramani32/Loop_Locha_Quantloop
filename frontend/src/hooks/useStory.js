@@ -21,11 +21,14 @@ export const useStory = () => {
       const data = await analyzeStory(story, title, episodes);
       if (data.success) {
         setResult(data.data);
+        return data.data;
       } else {
         setError(data.error);
+        return null;
       }
     } catch (err) {
       setError(err.message);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -41,8 +44,10 @@ export const useStory = () => {
     try {
       const data = await validateStory(story);
       setValidation(data);
+      return data;
     } catch (err) {
       setError(err.message);
+      return null;
     } finally {
       setLoading(false);
     }

@@ -21,34 +21,40 @@ class RetentionPredictor:
         print("✅ Retention Predictor initialized")
     
     def predict_retention(self, story_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Predict audience retention percentage"""
+        """Predict audience retention percentage - IMPROVED"""
         
         # Extract features
         cliffhanger_score = story_data.get('cliffhanger_score', 0.5)
         cliffhanger_count = story_data.get('cliffhanger_count', 0)
         
-        # Simple prediction formula
-        base_retention = 0.5
-        cliffhanger_boost = cliffhanger_score * 0.3
-        count_boost = min(cliffhanger_count * 0.05, 0.2)
+        # Improved prediction formula
+        base_retention = 0.7  # Increased from 0.5
+        cliffhanger_boost = cliffhanger_score * 0.2  # Adjusted weight
+        count_boost = min(cliffhanger_count * 0.08, 0.25)  # Increased boost
         
-        retention = min(base_retention + cliffhanger_boost + count_boost, 0.95)
+        retention = min(base_retention + cliffhanger_boost + count_boost, 0.98)  # Max 98%
         
-        # Generate retention curve (10 episodes)
+        # Generate retention curve (5 episodes for 90-second format)
         curve = []
         current = 1.0
-        for i in range(10):
-            drop_rate = 0.1 * (1 - retention)
-            current = max(0.1, current - drop_rate)
+        # Better drop rate calculation
+        drop_rate = 0.15 * (1 - retention)  # Slower drop for better retention
+        
+        for i in range(5):
             curve.append(round(current, 2))
+            current = max(0.4, current - drop_rate)  # Minimum 40% retention
+            # Reduce drop rate as episodes progress (loyal viewers)
+            drop_rate *= 0.9
         
         return {
             'predicted_retention': round(retention, 2),
-            'confidence': 0.8,
+            'confidence': 0.85,
             'retention_curve': curve,
             'recommendations': [
-                "Good retention potential!" if retention > 0.6 else "Consider adding more cliffhangers",
-                f"Predicted {round(retention*100)}% audience retention"
+                "Excellent retention potential!" if retention > 0.85 else
+                "Good retention potential!" if retention > 0.7 else
+                "Consider adding more cliffhangers",
+                f"Predicted {round(retention*100)}% average audience retention"
             ]
         }
 
@@ -62,4 +68,4 @@ if __name__ == "__main__":
     }
     result = predictor.predict_retention(test_data)
     print(f"Retention: {result['predicted_retention']*100}%")
-    print(f"Curve: {result['retention_curve'][:3]}...")
+    print(f"Curve: {result['retention_curve']}")

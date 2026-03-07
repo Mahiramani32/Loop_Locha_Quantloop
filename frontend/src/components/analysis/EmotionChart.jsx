@@ -25,7 +25,10 @@ ChartJS.register(
 const EmotionChart = ({ data }) => {
   // Generate labels based on actual data length (one point per episode)
   const dataLength = data.joy?.length || 5;
-  const chartLabels = Array.from({ length: dataLength }, (_, i) => `Ep ${i + 1}`);
+  const chartLabels = Array.from(
+    { length: dataLength },
+    (_, i) => `Ep ${i + 1}`,
+  );
 
   const chartData = {
     labels: chartLabels.slice(0, data.joy?.length || 5),
@@ -78,15 +81,39 @@ const EmotionChart = ({ data }) => {
     plugins: {
       legend: {
         position: "top",
-      },
-      title: {
-        display: false,
+        labels: {
+          color: document.documentElement.classList.contains("dark")
+            ? "#fff"
+            : "#333",
+        },
       },
     },
     scales: {
       y: {
         beginAtZero: true,
         max: 100,
+        grid: {
+          color: document.documentElement.classList.contains("dark")
+            ? "rgba(255,255,255,0.1)"
+            : "rgba(0,0,0,0.1)",
+        },
+        ticks: {
+          color: document.documentElement.classList.contains("dark")
+            ? "#fff"
+            : "#333",
+        },
+      },
+      x: {
+        grid: {
+          color: document.documentElement.classList.contains("dark")
+            ? "rgba(255,255,255,0.1)"
+            : "rgba(0,0,0,0.1)",
+        },
+        ticks: {
+          color: document.documentElement.classList.contains("dark")
+            ? "#fff"
+            : "#333",
+        },
       },
     },
   };

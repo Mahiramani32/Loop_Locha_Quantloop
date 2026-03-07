@@ -7,6 +7,7 @@ Author: Person 2
 import sys
 import os
 import re
+import random
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from models.qwen_model import get_qwen_model
@@ -39,7 +40,7 @@ class StoryDecomposer:
         # System prompt for Qwen
         system_prompt = """You are a professional scriptwriter who creates engaging episodic content for vertical videos (90 seconds each episode)."""
         
-        # User prompt - UPDATED to include description field
+        # User prompt
         prompt = f"""Task: Split this story into {num_episodes} episodes for a vertical video series.
 
 Story: {story}
@@ -47,7 +48,7 @@ Story: {story}
 Requirements:
 - Each episode must be ~90 seconds when filmed
 - End each episode with a cliffhanger to make viewers want the next episode
-- Give each episode a catchy title
+- Give each episode a catchy title based on what happens in that episode
 - Maintain story continuity across episodes
 - The 'summary' should be a short 1-2 sentence logline.
 - The 'description' MUST be a detailed 60-100 word narrative of exactly what happens, including scene changes, character actions, and dialogue hooks.
@@ -57,10 +58,10 @@ Format:
 [
   {{
     "number": 1,
-    "title": "The Discovery",
-    "summary": "Priya finds a mysterious key.",
-    "description": "Detective Priya arrives at the crime scene in the pouring rain. While inspecting the victim's abandoned car, she notices a strange glowing key tucked beneath the floor mat. As she touches it, visions flash before her eyes. She hears a whisper: 'Find the door...'",
-    "cliffhanger": "Suddenly, the key begins to glow brighter and a mysterious figure appears in the shadows."
+    "title": "Title based on episode content",
+    "summary": "Short summary...",
+    "description": "Detailed description...",
+    "cliffhanger": "Cliffhanger ending..."
   }},
   ...
 ]
@@ -77,33 +78,25 @@ Return ONLY the JSON array, no other text."""
             )
             
             if response:
-                # Extract JSON from response
                 episodes = self.qwen.extract_json(response)
                 
                 if episodes and isinstance(episodes, list):
-                    # Ensure each episode has all required fields
                     validated_episodes = []
                     for i, ep in enumerate(episodes):
-                        # Make sure we have a valid episode dict
                         if not isinstance(ep, dict):
                             ep = {}
                         
-                        # Ensure number is correct
                         ep['number'] = i + 1
                         
-                        # Ensure title exists - THIS IS CRITICAL!
                         if 'title' not in ep or not ep['title']:
                             ep['title'] = f"Episode {i+1}"
                         
-                        # Ensure summary exists
                         if 'summary' not in ep or not ep['summary']:
                             ep['summary'] = f"Part {i+1} of the story continues."
                         
-                        # Ensure description exists
                         if 'description' not in ep or not ep['description']:
                             ep['description'] = ep.get('summary', f"Episode {i+1} content")
                         
-                        # Ensure cliffhanger exists
                         if 'cliffhanger' not in ep or not ep['cliffhanger']:
                             ep['cliffhanger'] = "To be continued..." if i < num_episodes - 1 else "The end... or is it?"
                         
@@ -115,84 +108,90 @@ Return ONLY the JSON array, no other text."""
         except Exception as e:
             print(f"⚠️ Story decomposition error: {e}")
         
-        # Fallback to simple decomposition with proper fields
         print("⚠️ Using enhanced fallback decomposition")
         return self._enhanced_fallback_decompose(story, num_episodes)
     
     def _enhanced_fallback_decompose(self, story, num_episodes):
-        """Enhanced fallback with proper fields"""
-        import re
+        """Enhanced fallback that creates titles from the actual story content"""
+        
+        story = story.strip()
         
         # Split into sentences
-        sentences = [s.strip() + '.' for s in story.split('.') if len(s.strip()) > 10]
+        sentences = []
+        raw_sentences = re.split(r'(?<=[.!?])\s+', story)
+        for s in raw_sentences:
+            if s.strip():
+                sentences.append(s.strip())
+        
+        # Ensure we have enough segments
+        if len(sentences) < num_episodes * 1.5:
+            expanded = []
+            for sent in sentences:
+                if len(sent.split()) > 20:
+                    parts = re.split(r'(?:,\s*|\s+and\s+|\s+but\s+)', sent)
+                    expanded.extend([p.strip() + '.' for p in parts if len(p.strip()) > 10])
+                else:
+                    expanded.append(sent)
+            sentences = expanded
         
         if len(sentences) < num_episodes:
-            # Not enough sentences, split by words
             words = story.split()
             words_per_episode = max(1, len(words) // num_episodes)
-            episodes = []
-            
+            sentences = []
             for i in range(num_episodes):
                 start = i * words_per_episode
                 end = start + words_per_episode if i < num_episodes - 1 else len(words)
-                episode_text = ' '.join(words[start:end])
-                
-                # Create a proper title
-                title = f"Episode {i+1}"
-                if i == 0:
-                    title = "The Beginning"
-                elif i == num_episodes - 1:
-                    title = "The Final Chapter"
-                else:
-                    title = f"Part {i+1}"
-                
-                # Create a proper description
-                description = episode_text
-                if len(description) < 100:
-                    description += " This episode continues the story with exciting developments and character moments."
-                
-                episodes.append({
-                    "number": i + 1,
-                    "title": title,
-                    "summary": episode_text[:80] + "..." if len(episode_text) > 80 else episode_text,
-                    "description": description,
-                    "cliffhanger": "To be continued..." if i < num_episodes - 1 else "The end... or is it?"
-                })
-            return episodes
+                sentences.append(' '.join(words[start:end]))
         
-        # Distribute sentences across episodes
-        sentences_per_episode = max(1, len(sentences) // num_episodes)
         episodes = []
-        
-        # Titles for episodes
-        titles = [
-            "The Discovery", "The Mystery Deepens", "Hidden Truths",
-            "Unexpected Turns", "The Revelation", "Final Confrontation",
-            "The Aftermath", "New Beginning"
-        ]
+        sentences_per_episode = max(1, len(sentences) // num_episodes)
         
         for i in range(num_episodes):
             start = i * sentences_per_episode
             end = start + sentences_per_episode if i < num_episodes - 1 else len(sentences)
             
-            # Combine sentences for this episode
             episode_sentences = sentences[start:end]
-            summary = ' '.join(episode_sentences[:2])  # First 2 sentences as summary
-            description = ' '.join(episode_sentences)  # All sentences as description
+            base_content = ' '.join(episode_sentences)
             
-            # Add narrative flair if description is too short
-            if len(description.split()) < 50:
-                description += " The tension builds as the characters face new challenges and unexpected revelations unfold."
+            # ===== GENERATE TITLE FROM ACTUAL STORY CONTENT =====
+            if episode_sentences:
+                first_sentence = episode_sentences[0]
+                words = first_sentence.split()
+                if len(words) > 4:
+                    # Take first 4-5 words for title
+                    title_words = words[:min(5, len(words))]
+                    title = ' '.join(title_words).rstrip('.,!?')
+                    title = title[0].upper() + title[1:] if title else f"Part {i+1}"
+                elif len(words) > 2:
+                    title = ' '.join(words[:3]).rstrip('.,!?')
+                else:
+                    title = first_sentence.rstrip('.,!?')
+            else:
+                title = f"Episode {i+1}"
             
-            # Get title from list or generate
-            title = titles[i] if i < len(titles) else f"Episode {i+1}"
+            # Create summary
+            summary = episode_sentences[0] if episode_sentences else f"Episode {i+1}"
+            if len(summary) > 80:
+                summary = summary[:80] + "..."
+            
+            # Description is the actual content
+            description = base_content
+            
+            # Cliffhanger based on next episode
+            if i < num_episodes - 1 and end < len(sentences):
+                next_hint = sentences[end][:50]
+                cliffhanger = f"Little did they know, {next_hint.lower()} would change everything..."
+            elif i < num_episodes - 1:
+                cliffhanger = "But something unexpected was about to happen..."
+            else:
+                cliffhanger = "The story reaches its conclusion, but some mysteries remain..."
             
             episodes.append({
                 "number": i + 1,
                 "title": title,
-                "summary": summary[:100] + "..." if len(summary) > 100 else summary,
+                "summary": summary,
                 "description": description,
-                "cliffhanger": "To be continued..." if i < num_episodes - 1 else "The end... or is it?"
+                "cliffhanger": cliffhanger
             })
         
         return episodes
@@ -202,29 +201,3 @@ Return ONLY the JSON array, no other text."""
 def decompose_story(story, num_episodes=5, language="en"):
     decomposer = StoryDecomposer()
     return decomposer.decompose(story, num_episodes, language)
-
-
-if __name__ == "__main__":
-    # Self-test
-    print("=" * 50)
-    print("STORY DECOMPOSER - TEST")
-    print("=" * 50)
-    
-    decomposer = StoryDecomposer()
-    
-    test_story = """
-    A detective named Priya finds a mysterious key at a crime scene. 
-    The key glows in her hand and she hears whispers. She discovers 
-    a hidden door that appears only at midnight. When she opens it, 
-    she sees her dead partner alive in a parallel world. She must 
-    choose between staying in this perfect world or returning home. 
-    But something evil follows her through the door.
-    """
-    
-    episodes = decomposer.decompose(test_story, num_episodes=5)
-    
-    for ep in episodes:
-        print(f"\n📺 Episode {ep['number']}: {ep['title']}")
-        print(f"   Summary: {ep['summary'][:80]}...")
-        print(f"   Description: {ep['description'][:100]}...")
-        print(f"   Cliffhanger: {ep['cliffhanger']}")

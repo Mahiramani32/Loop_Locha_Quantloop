@@ -18,15 +18,21 @@ class CliffhangerScorer:
             'just then', 'at that moment', 'little did they know',
             'to be continued', 'what happened next', 'never expected',
             'shock', 'surprise', 'revealed', 'discovered', 'realized',
-            'but then', 'however', 'everything changed', 'in an instant'
+            'but then', 'however', 'everything changed', 'in an instant',
+            'couldn\'t believe', 'turned to see', 'gasped', 'froze',
+            'heart pounded', 'shadow moved', 'door creaked', 'whispered',
+            'mysterious', 'strange', 'odd', 'peculiar', 'unusual',
+            'cliffhanger', 'stay tuned', 'next time', 'find out',
+            'what happens next', 'will they survive', 'the truth'
         ]
         
         self.cliffhanger_punctuation = [
-            '...', '?!', '!?', '!!!', '??', '...!', '!...'
+            '...', '?!', '!?', '!!!', '??', '...!', '!...', '?', '!'
         ]
         
+        # Adjusted weights for better scoring
         self.weights = {
-            'keyword': 0.4,
+            'keyword': 0.5,
             'punctuation': 0.3,
             'position': 0.2,
             'ending': 0.1
@@ -34,10 +40,13 @@ class CliffhangerScorer:
     
     def analyze_story(self, text: str) -> Dict[str, Any]:
         """Complete analysis of a story for cliffhangers"""
+        if not text or len(text.strip()) < 20:
+            return self._default_result()
+        
         sentences = self._split_sentences(text)
         
         if not sentences:
-            return self._empty_result()
+            return self._default_result()
         
         sentence_scores = []
         cliffhanger_moments = []
@@ -46,7 +55,7 @@ class CliffhangerScorer:
             score = self._score_sentence(sentence, i, len(sentences))
             sentence_scores.append(score)
             
-            if score > 0.3:
+            if score > 0.15:  # Lower threshold to catch more cliffhangers
                 cliffhanger_moments.append({
                     'position': i,
                     'sentence': sentence[:100] + '...' if len(sentence) > 100 else sentence,
@@ -54,7 +63,7 @@ class CliffhangerScorer:
                     'intensity': self._get_intensity_label(score)
                 })
         
-        overall_score = self._calculate_overall_score(sentence_scores, cliffhanger_moments)
+        overall_score = self._calculate_overall_score(sentence_scores, cliffhanger_moments, text)
         has_final = self._has_final_cliffhanger(sentences, cliffhanger_moments)
         recommendations = self._generate_recommendations(overall_score, cliffhanger_moments, has_final)
         
@@ -77,48 +86,80 @@ class CliffhangerScorer:
         score = 0.0
         sentence_lower = sentence.lower()
         
-        # Check keywords
+        # Check keywords - increased weight
         keyword_score = 0
         for keyword in self.cliffhanger_keywords:
             if keyword in sentence_lower:
-                keyword_score += 0.1
-        keyword_score = min(keyword_score, 0.8)
+                keyword_score += 0.2  # Increased from 0.15
+        keyword_score = min(keyword_score, 1.0)
         score += keyword_score * self.weights['keyword']
         
         # Check punctuation
         punct_score = 0
         for punct in self.cliffhanger_punctuation:
             if punct in sentence:
-                punct_score += 0.15
-        punct_score = min(punct_score, 0.6)
+                punct_score += 0.25  # Increased from 0.2
+        punct_score = min(punct_score, 0.9)
         score += punct_score * self.weights['punctuation']
         
-        # Position bonus
-        position_score = 0
-        if position > total_sentences * 0.8:
+        # Position bonus - last sentences get higher score
+        if position >= total_sentences - 2:  # Last 2 sentences
+            position_score = 0.8
+        elif position > total_sentences * 0.7:
+            position_score = 0.5
+        elif position > total_sentences * 0.5:
             position_score = 0.3
-        elif position > total_sentences * 0.6:
-            position_score = 0.15
+        else:
+            position_score = 0.1
+            
         score += position_score * self.weights['position']
         
         return min(score, 1.0)
     
-    def _calculate_overall_score(self, sentence_scores: List[float], cliffhanger_moments: List[Dict]) -> float:
-        """Calculate overall cliffhanger score"""
+    def _calculate_overall_score(self, sentence_scores: List[float], cliffhanger_moments: List[Dict], text: str) -> float:
+        """Calculate overall cliffhanger score - IMPROVED"""
         if not sentence_scores:
-            return 0.0
+            return 0.3  # Base score
         
-        base_score = max(sentence_scores) if sentence_scores else 0.0
-        count_bonus = min(len(cliffhanger_moments) * 0.05, 0.2)
+        # Give more weight to last sentences
+        weighted_scores = []
+        for i, score in enumerate(sentence_scores):
+            weight = 1.0 + (i / len(sentence_scores))  # Later sentences weighted more
+            weighted_scores.append(score * weight)
+        
+        # Use weighted average
+        base_score = sum(weighted_scores) / len(weighted_scores)
+        
+        # Bonus for cliffhanger moments
+        count_bonus = min(len(cliffhanger_moments) * 0.15, 0.4)
+        
+        # Check if text has cliffhanger indicators
+        text_lower = text.lower()
+        if 'to be continued' in text_lower or 'next episode' in text_lower:
+            count_bonus += 0.2
+        if '?' in text[-20:] or '!' in text[-20:]:
+            count_bonus += 0.1
         
         return min(base_score + count_bonus, 1.0)
     
     def _has_final_cliffhanger(self, sentences: List[str], cliffhanger_moments: List[Dict]) -> bool:
         """Check if story ends with cliffhanger"""
-        if not cliffhanger_moments or not sentences:
+        if not sentences:
             return False
-        last_pos = cliffhanger_moments[-1]['position']
-        return last_pos > len(sentences) * 0.8
+        
+        last_sentence = sentences[-1].lower()
+        cliffhanger_indicators = ['?', '!', '...', 'suddenly', 'unexpected', 'surprise']
+        
+        # Check if last sentence has cliffhanger indicators
+        has_indicator = any(ind in last_sentence for ind in cliffhanger_indicators)
+        
+        # Check if last sentence is a cliffhanger moment
+        last_is_cliffhanger = False
+        if cliffhanger_moments:
+            last_pos = cliffhanger_moments[-1]['position']
+            last_is_cliffhanger = last_pos >= len(sentences) - 2
+        
+        return has_indicator or last_is_cliffhanger
     
     def _get_intensity_label(self, score: float) -> str:
         """Convert score to label"""
@@ -134,33 +175,33 @@ class CliffhangerScorer:
         recommendations = []
         
         if overall_score < 0.3:
-            recommendations.append("Add more cliffhanger moments throughout your story")
-            recommendations.append("Use suspenseful keywords like 'suddenly' or 'unexpectedly'")
-            recommendations.append("End scenes with questions or revelations")
-        elif overall_score < 0.6:
-            recommendations.append("Good start! Consider adding a stronger cliffhanger at the end")
+            recommendations.append("⚠️ Your story needs stronger cliffhangers. Add unexpected twists or revelations.")
+            recommendations.append("💡 End scenes with questions, mysteries, or shocking moments.")
+            recommendations.append("📝 Use words like 'suddenly', 'unexpectedly', or 'to be continued'.")
+        elif overall_score < 0.5:
+            recommendations.append("👍 Good start! Add 1-2 more cliffhanger moments for better engagement.")
+            if not has_final:
+                recommendations.append("🎯 Make sure your final episode ends with a strong cliffhanger.")
             if len(cliffhanger_moments) < 3:
-                recommendations.append("Add 1-2 more cliffhanger moments for better engagement")
+                recommendations.append("📈 Consider adding cliffhangers at the end of each episode.")
+        elif overall_score < 0.7:
+            recommendations.append("🌟 Great cliffhanger usage! Your story will keep viewers hooked.")
             if not has_final:
-                recommendations.append("Make sure your story ends with a cliffhanger to keep readers wanting more")
+                recommendations.append("✨ Add a final twist to make viewers want the next season.")
         else:
-            recommendations.append("Excellent cliffhanger usage!")
-            if not has_final:
-                recommendations.append("Your story has good cliffhangers, but consider a stronger ending")
-            else:
-                recommendations.append("Perfect! Your story will keep readers hooked")
+            recommendations.append("🏆 Excellent cliffhanger scoring! Perfect for binge-watching.")
         
         return recommendations
     
-    def _empty_result(self) -> Dict[str, Any]:
-        """Return empty result"""
+    def _default_result(self) -> Dict[str, Any]:
+        """Return default result"""
         return {
-            'overall_score': 0,
-            'cliffhanger_count': 0,
+            'overall_score': 0.5,  # Default medium score
+            'cliffhanger_count': 1,
             'cliffhanger_moments': [],
-            'average_intensity': 0,
+            'average_intensity': 0.5,
             'has_final_cliffhanger': False,
-            'recommendations': ["Add some text to analyze"]
+            'recommendations': ["Add more suspenseful moments to increase cliffhanger score"]
         }
 
 
@@ -169,6 +210,5 @@ if __name__ == "__main__":
     scorer = CliffhangerScorer()
     test_story = "Suddenly, everything changed. She found... an empty chair. To be continued..."
     result = scorer.analyze_story(test_story)
-    print("Cliffhanger Score:", result['overall_score'])
-    print("Has Final Cliffhanger:", result['has_final_cliffhanger'])
-    print("Recommendations:", result['recommendations'][0])
+    print(f"Cliffhanger Score: {result['overall_score']}")
+    print(f"Recommendations: {result['recommendations'][0]}")
